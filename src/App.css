@@ -51,12 +51,6 @@ body {
   overflow: hidden;
   border: 1px solid #e8e8e8;
   min-width: 380px;
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
-  transform: translateY(-5px);
 }
 
 /* 头部样式 */
@@ -64,11 +58,20 @@ body {
   padding: 24px;
   background: linear-gradient(to bottom, #ffffff, #fafafa);
   border-bottom: 1px solid #f0f0f0;
-  height: 220px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 控制面板样式 */
+.control-panel {
+  margin-top: auto;
+  padding-top: 12px;
 }
 
 .card-title h3 {
-  margin: 0 0 12px 0;
+  margin: 0;
   font-size: 1.3rem;
   display: flex;
   align-items: center;
