@@ -153,7 +153,7 @@ const App = () => {
 
         <div className="card incremental">
           <div className="card-title">
-            <h3>精准定位实验室</h3>
+            <h3>精准定位</h3>
             <div className="analysis-box">
               <div className="analysis-tag info">scrollToIndex + 智能对齐</div>
               <div className="analysis-content">
