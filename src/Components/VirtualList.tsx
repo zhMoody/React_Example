@@ -39,7 +39,7 @@ const VirtualList: FC<VirtualListProps> = ({
     <div
       ref={currentRef}
       style={{
-        width: "100%", // 改为 100%
+        width: "100%",
         height: `${containerHight}px`,
         overflow: "auto",
         position: "relative",
