@@ -6,8 +6,19 @@ import SegmentedVirtualList from "./Components/SegmentedVirtualList";
 import IncrementalVirtualList, {
   IncrementalListRef,
 } from "./Components/IncrementalVirtualList";
-import { useMemo, useState, useRef } from "react";
+import EditableVirtualList, {
+  EditableListRef,
+} from "./Components/EditableVirtualList";
+import { useState, useRef } from "react";
 
+// 定义跳转对齐枚举
+enum JumpAlign {
+  START = "start",
+  CENTER = "center",
+  END = "end",
+}
+
+// 预设的一组随机文本，模拟真实业务中长短不一的内容
 const RANDOM_TEXTS = [
   "短小精悍。",
   "这是一段中等长度的描述文字，用于测试列表的撑开效果。",
@@ -17,10 +28,14 @@ const RANDOM_TEXTS = [
   "换行测试\n换行测试\n换行测试",
 ];
 
-const generateRandomData = (count: number, startIndex: number = 0) => {
+/**
+ * 【性能优化点 1】
+ * 抽取数据生成逻辑到组件外部。
+ * 这样即便是 App 组件因为输入框变动而重绘，这份数据生成逻辑也不会被重复执行。
+ */
+const generateRandomData = (count: number) => {
   const data = [];
   for (let i = 0; i < count; i++) {
-    const globalIdx = startIndex + i;
     const textCount = Math.floor(Math.random() * 3) + 1;
     let content = "";
     for (let j = 0; j < textCount; j++) {
@@ -28,40 +43,47 @@ const generateRandomData = (count: number, startIndex: number = 0) => {
         RANDOM_TEXTS[Math.floor(Math.random() * RANDOM_TEXTS.length)] + " ";
     }
     data.push({
-      id: globalIdx,
-      content: `[ID: ${globalIdx}] ${content}`,
+      id: i, // 稳定 ID 极其重要，它是虚拟列表复用 DOM 的唯一凭证
+      content: `[ID: ${i}] ${content.trim()}`,
     });
   }
   return data;
 };
 
+// 【性能优化点 2】
+// 全局单例数据源。所有的实验室卡片都共享这 10 万个对象的内存引用。
+const GLOBAL_DATA_SOURCE = generateRandomData(100000);
+
 const App = () => {
-  const listData = useMemo(() => generateRandomData(100000), []);
-  const [incrementalData] = useState(() => generateRandomData(100000));
+  // 引用共享数据源
+  const sharedListData = GLOBAL_DATA_SOURCE;
+
+  // 获取子组件的命令式接口（Ref）
   const incrementalRef = useRef<IncrementalListRef>(null);
+  const editableRef = useRef<EditableListRef>(null);
 
-  // 跳转相关状态
-  const [jumpIndex, setJumpIndex] = useState(1000);
-  const [jumpAlign, setJumpAlign] = useState<"start" | "center" | "end">(
-    "center",
-  );
+  /**
+   * 【状态管理】
+   * 这里的状态主要用于控制跳转。
+   * 注意：使用了 React 的受控组件逻辑，输入数字时 App 会重绘，
+   * 得益于上方的全局数据源，这种重绘是极其轻量的。
+   */
+  const [jumpIndex, setJumpIndex] = useState(1000); // 列表 4 的跳转索引
+  const [jumpAlign, setJumpAlign] = useState<JumpAlign>(JumpAlign.CENTER); // 列表 4 的对齐方式
 
-  const handleJump = () => {
-    incrementalRef.current?.scrollToIndex(jumpIndex, jumpAlign);
-  };
+  const [editJumpIndex, setEditJumpIndex] = useState(100); // 列表 5 的跳转索引
 
   return (
     <div className="app-container">
       <div className="header-section">
-        <h1>虚拟列表演进</h1>
+        <h1>虚拟列表演进实验室</h1>
         <p>
-          并列对比 10万 条数据的渲染性能。通过控制 DOM 数量和位置计算算法，
-          实现超大规模列表的丝滑滚动。
+          并列对比 100,000 条数据的渲染性能。探索从 O(1) 数学定位到全功能 CRUD
+          的技术演进。
         </p>
       </div>
 
       <div className="list-comparison-grid">
-        {/* 1. 固定高度方案 */}
         <div className="card fixed">
           <div className="card-title">
             <h3>固定高度</h3>
@@ -69,15 +91,14 @@ const App = () => {
               <div className="analysis-tag info">O(1) 数学定位</div>
               <div className="analysis-content">
                 <span className="analysis-label negative">缺点:</span>
-                高度定死，内容无法撑开，缺乏业务适用性。而且拖动滚动条会白屏
+                高度定死，无法承开文本。但性能最高，计算最简单。
               </div>
             </div>
-            {/* 仅留白以保持高度对齐 */}
             <div style={{ height: "38px", marginTop: "auto" }}></div>
           </div>
           <div className="list-viewport">
             <VirtualList
-              listData={listData}
+              listData={sharedListData}
               itemHeight={80}
               containerHight={650}
               bufferCount={10}
@@ -85,7 +106,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* 2. 普通动态高度方案 */}
         <div className="card dynamic">
           <div className="card-title">
             <h3>普通动态高度</h3>
@@ -93,15 +113,14 @@ const App = () => {
               <div className="analysis-tag info">测量 + O(n) 修正</div>
               <div className="analysis-content">
                 <span className="analysis-label negative">缺点:</span>
-                快速拖拽白屏。$O(n)$
-                全量修正难以扩展至百万级数据。拖动滚动条白屏,滚动条不跟手
+                原生滚动异步性导致快速滑动白屏。修正算法难以支撑百万级。
               </div>
             </div>
             <div style={{ height: "38px", marginTop: "auto" }}></div>
           </div>
           <div className="list-viewport">
             <DynamicVirtualList
-              listData={listData}
+              listData={sharedListData}
               estimatedItemHeight={80}
               containerHeight={650}
               bufferCount={10}
@@ -109,22 +128,21 @@ const App = () => {
           </div>
         </div>
 
-        {/* 3. 分片动态高度方案 */}
         <div className="card segmented">
           <div className="card-title">
-            <h3>分片动态高度+自定义进度条</h3>
+            <h3>分片动态高度</h3>
             <div className="analysis-box">
               <div className="analysis-tag info">分片 O(logN) + 状态同步</div>
               <div className="analysis-content">
                 <span className="analysis-label positive">核心:</span>
-                采用分片维护局部高度，大幅降低重算开销。引入自定义滚动条。
+                自定义滚动条解决了白屏问题。分片地图大幅提升了长列表更新性能。
               </div>
             </div>
             <div style={{ height: "38px", marginTop: "auto" }}></div>
           </div>
           <div className="list-viewport">
             <SegmentedVirtualList
-              listData={listData}
+              listData={sharedListData}
               estimatedItemHeight={80}
               containerHeight={650}
               bufferCount={10}
@@ -133,7 +151,6 @@ const App = () => {
           </div>
         </div>
 
-        {/* 4. 精准定位实验室 (NEW) */}
         <div className="card incremental">
           <div className="card-title">
             <h3>精准定位实验室</h3>
@@ -141,11 +158,9 @@ const App = () => {
               <div className="analysis-tag info">scrollToIndex + 智能对齐</div>
               <div className="analysis-content">
                 <span className="analysis-label positive">特性:</span>
-                支持输入任意行号进行<b>瞬时跳转</b>
-                。即使目标项从未被渲染，也能通过预估高度实现物理定位。
+                支持顶部/居中/底部跳转。具备基于预估高度的初定位和测量后的二次校准。
               </div>
             </div>
-
             <div
               className="control-panel"
               style={{
@@ -162,7 +177,6 @@ const App = () => {
                   type="number"
                   value={jumpIndex}
                   onChange={(e) => setJumpIndex(Number(e.target.value))}
-                  placeholder="索引"
                   style={{
                     width: "70px",
                     padding: "6px",
@@ -172,11 +186,12 @@ const App = () => {
                   }}
                 />
                 <button
-                  onClick={handleJump}
+                  onClick={() =>
+                    incrementalRef.current?.scrollToIndex(jumpIndex, jumpAlign)
+                  }
                   className="btn-jump"
                   style={{
                     padding: "6px 12px",
-                    cursor: "pointer",
                     background: "#4A90E2",
                     color: "#fff",
                     border: "none",
@@ -188,7 +203,6 @@ const App = () => {
                   跳转
                 </button>
               </div>
-
               <div
                 className="align-selector"
                 style={{
@@ -199,40 +213,103 @@ const App = () => {
                   marginLeft: "auto",
                 }}
               >
-                {(["start", "center", "end"] as const).map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setJumpAlign(mode)}
-                    style={{
-                      padding: "4px 8px",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                      fontSize: "11px",
-                      background: jumpAlign === mode ? "#fff" : "transparent",
-                      boxShadow:
-                        jumpAlign === mode
-                          ? "0 1px 3px rgba(0,0,0,0.1)"
-                          : "none",
-                      color: jumpAlign === mode ? "#4A90E2" : "#666",
-                      transition: "all 0.2s",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {mode === "start" ? "顶" : mode === "center" ? "中" : "底"}
-                  </button>
-                ))}
+                {[JumpAlign.START, JumpAlign.CENTER, JumpAlign.END].map(
+                  (mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => setJumpAlign(mode)}
+                      style={{
+                        padding: "4px 8px",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "11px",
+                        background: jumpAlign === mode ? "#fff" : "transparent",
+                        color: jumpAlign === mode ? "#4A90E2" : "#666",
+                      }}
+                    >
+                      {mode === JumpAlign.START
+                        ? "顶"
+                        : mode === JumpAlign.CENTER
+                          ? "中"
+                          : "底"}
+                    </button>
+                  ),
+                )}
               </div>
             </div>
           </div>
           <div className="list-viewport">
             <IncrementalVirtualList
               ref={incrementalRef}
-              listData={incrementalData}
+              listData={sharedListData}
               estimatedItemHeight={80}
               containerHeight={650}
               bufferCount={10}
               segmentSize={1000}
+            />
+          </div>
+        </div>
+
+        <div className="card editable">
+          <div className="card-title">
+            <h3>CRUD 动态分片高度虚拟列表</h3>
+            <div className="analysis-box">
+              <div className="analysis-tag info">编辑 + 增删 + 定位</div>
+              <div className="analysis-content">
+                <span className="analysis-label positive">核心:</span>
+                每一个 Item 都是独立的动态高度编辑器。支持 ID
+                级高度记忆和随动推移算法。
+              </div>
+            </div>
+            <div
+              className="control-panel"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                marginTop: "auto",
+              }}
+            >
+              <div
+                style={{ display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                <input
+                  type="number"
+                  value={editJumpIndex}
+                  onChange={(e) => setEditJumpIndex(Number(e.target.value))}
+                  style={{
+                    width: "70px",
+                    padding: "6px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    fontSize: "13px",
+                  }}
+                />
+                <button
+                  onClick={() =>
+                    editableRef.current?.scrollToIndex(editJumpIndex, "start")
+                  }
+                  className="btn-jump"
+                  style={{
+                    padding: "6px 12px",
+                    background: "#4A90E2",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    fontWeight: "bold",
+                    fontSize: "13px",
+                  }}
+                >
+                  跳转
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="list-viewport">
+            <EditableVirtualList
+              ref={editableRef}
+              initialData={sharedListData}
+              containerHeight={650}
             />
           </div>
         </div>

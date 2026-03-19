@@ -14,16 +14,18 @@ body {
 }
 
 .app-container {
-  width: 100vw;
-  padding: 40px 20px;
+  width: 100%;
+  padding: 40px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 100vh;
 }
 
 .header-section {
   text-align: center;
   margin-bottom: 40px;
+  max-width: 800px;
 }
 
 .header-section h1 {
@@ -34,15 +36,17 @@ body {
 
 .list-comparison-grid {
   display: flex;
-  justify-content: center;
-  gap: 24px;
+  justify-content: center; /* 确保卡片整体居中 */
+  gap: 20px;
   width: 100%;
-  max-width: 1500px;
+  max-width: 2200px;
+  overflow-x: auto;
+  padding-bottom: 30px; /* 为滚动条预留空间 */
 }
 
 /* 列表卡片 */
 .card {
-  flex: 1;
+  flex: 0 0 380px; /* 强制固定宽度，防止在 5 个并排时冲突 */
   background: white;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -50,7 +54,6 @@ body {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid #e8e8e8;
-  min-width: 380px;
 }
 
 /* 头部样式 */

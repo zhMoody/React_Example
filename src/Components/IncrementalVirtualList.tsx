@@ -5,7 +5,6 @@ import React, {
   useCallback,
   useImperativeHandle,
   forwardRef,
-  useEffect,
 } from "react";
 import CustomScrollbar from "./CustomScrollbar";
 
@@ -130,22 +129,25 @@ const IncrementalVirtualList = forwardRef<
     /**
      * 计算指定索引的理想滚动位置
      */
-    const getTargetScrollTop = useCallback((index: number, align: "start" | "center" | "end") => {
-      const sIdx = Math.floor(index / segmentSize);
-      const iIdx = index % segmentSize;
-      const segment = segments.current[sIdx];
-      if (!segment || !segment.items[iIdx]) return null;
+    const getTargetScrollTop = useCallback(
+      (index: number, align: "start" | "center" | "end") => {
+        const sIdx = Math.floor(index / segmentSize);
+        const iIdx = index % segmentSize;
+        const segment = segments.current[sIdx];
+        if (!segment || !segment.items[iIdx]) return null;
 
-      const item = segment.items[iIdx];
-      let target = segment.top + item.top;
+        const item = segment.items[iIdx];
+        let target = segment.top + item.top;
 
-      if (align === "center") {
-        target -= (containerHeight - item.height) / 2;
-      } else if (align === "end") {
-        target -= (containerHeight - item.height);
-      }
-      return target;
-    }, [containerHeight, segmentSize]);
+        if (align === "center") {
+          target -= (containerHeight - item.height) / 2;
+        } else if (align === "end") {
+          target -= containerHeight - item.height;
+        }
+        return target;
+      },
+      [containerHeight, segmentSize],
+    );
 
     /**
      * 执行跳转
@@ -161,7 +163,7 @@ const IncrementalVirtualList = forwardRef<
           setPendingJump({ index, align, count: 0 });
         }
       },
-      [getTargetScrollTop, containerHeight]
+      [getTargetScrollTop, containerHeight],
     );
 
     /**
@@ -173,11 +175,11 @@ const IncrementalVirtualList = forwardRef<
       if (pendingJump) {
         const { index, align, count } = pendingJump;
         const target = getTargetScrollTop(index, align);
-        
+
         if (target !== null) {
           const maxST = phantomHeight - containerHeight;
           const finalST = Math.max(0, Math.min(target, maxST));
-          
+
           // 如果当前位置和目标位置差值超过 1 像素，则进行校准
           if (Math.abs(finalST - scrollTop) > 1 && count < 3) {
             setScrollTop(finalST);
@@ -190,10 +192,14 @@ const IncrementalVirtualList = forwardRef<
       }
     }); // 每一帧都检查，直到对齐或超过尝试次数
 
-    useImperativeHandle(ref, () => ({
-      scrollToIndex,
-      getScrollTop: () => scrollTop
-    }), [scrollToIndex, scrollTop]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        scrollToIndex,
+        getScrollTop: () => scrollTop,
+      }),
+      [scrollToIndex, scrollTop],
+    );
 
     /**
      * 查找逻辑
@@ -201,7 +207,9 @@ const IncrementalVirtualList = forwardRef<
     const findStartIndex = (st: number) => {
       const segs = segments.current;
       if (segs.length === 0) return 0;
-      let sLeft = 0, sRight = segs.length - 1, sIdx = 0;
+      let sLeft = 0,
+        sRight = segs.length - 1,
+        sIdx = 0;
       while (sLeft <= sRight) {
         const mid = Math.floor((sLeft + sRight) / 2);
         if (segs[mid].top <= st) {
@@ -214,7 +222,9 @@ const IncrementalVirtualList = forwardRef<
       const segment = segs[sIdx];
       if (!segment) return 0;
       const internalST = st - segment.top;
-      let iLeft = 0, iRight = segment.items.length - 1, iIdx = 0;
+      let iLeft = 0,
+        iRight = segment.items.length - 1,
+        iIdx = 0;
       while (iLeft <= iRight) {
         const mid = Math.floor((iLeft + iRight) / 2);
         if (segment.items[mid].bottom > internalST) {
@@ -233,7 +243,7 @@ const IncrementalVirtualList = forwardRef<
     const handleWheel = (e: React.WheelEvent) => {
       // 如果正在自动跳转，禁用手动滚轮，防止冲突
       if (pendingJump) return;
-      
+
       const newST = scrollTop + e.deltaY;
       const maxST = phantomHeight - containerHeight;
       setScrollTop(Math.max(0, Math.min(newST, maxST)));
@@ -258,7 +268,8 @@ const IncrementalVirtualList = forwardRef<
           item.bottom = item.top + height;
           for (let i = iIdx + 1; i < segment.items.length; i++) {
             segment.items[i].top = segment.items[i - 1].bottom;
-            segment.items[i].bottom = segment.items[i].top + segment.items[i].height;
+            segment.items[i].bottom =
+              segment.items[i].top + segment.items[i].height;
           }
           const oldTotal = segment.totalHeight;
           segment.totalHeight = segment.items[segment.items.length - 1].bottom;
@@ -279,7 +290,10 @@ const IncrementalVirtualList = forwardRef<
 
     const renderStart = Math.max(0, start - bufferCount);
     const visibleCount = Math.ceil(containerHeight / estimatedItemHeight);
-    const renderEnd = Math.min(listData.length, start + visibleCount + bufferCount);
+    const renderEnd = Math.min(
+      listData.length,
+      start + visibleCount + bufferCount,
+    );
     const visibleData = listData.slice(renderStart, renderEnd);
 
     const getAbsoluteTop = (idx: number) => {
@@ -289,7 +303,7 @@ const IncrementalVirtualList = forwardRef<
       if (!seg || !seg.items[iIdx]) return 0;
       return seg.top + seg.items[iIdx].top;
     };
-    
+
     const startOffset = getAbsoluteTop(renderStart);
 
     return (
@@ -301,7 +315,7 @@ const IncrementalVirtualList = forwardRef<
           overflow: "hidden",
           position: "relative",
           background: "#fff",
-          border: "1px solid #ddd"
+          border: "1px solid #ddd",
         }}
       >
         <CustomScrollbar
@@ -331,7 +345,7 @@ const IncrementalVirtualList = forwardRef<
         </div>
       </div>
     );
-  }
+  },
 );
 
 const IncrementalItem: React.FC<{
@@ -358,17 +372,21 @@ const IncrementalItem: React.FC<{
       }}
     >
       <div style={{ marginBottom: "4px" }}>
-        <span style={{
-          background: "#4A90E2",
-          color: "#fff",
-          padding: "1px 6px",
-          borderRadius: "3px",
-          fontSize: "11px"
-        }}>
+        <span
+          style={{
+            background: "#4A90E2",
+            color: "#fff",
+            padding: "1px 6px",
+            borderRadius: "3px",
+            fontSize: "11px",
+          }}
+        >
           INDEX: {index}
         </span>
       </div>
-      <div style={{ color: "#333", fontSize: "14px", lineHeight: "1.4" }}>{content}</div>
+      <div style={{ color: "#333", fontSize: "14px", lineHeight: "1.4" }}>
+        {content}
+      </div>
     </div>
   );
 };
