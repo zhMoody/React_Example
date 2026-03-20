@@ -1,135 +1,133 @@
 * {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 :root {
-  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #f0f2f5;
-  color: #333;
+	font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	background-color: #f0f2f5;
+	color: #333;
 }
 
 body {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 .app-container {
-  width: 100%;
-  padding: 40px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
+	width: 100%;
+	padding: 40px 40px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
 }
 
 .header-section {
-  text-align: center;
-  margin-bottom: 40px;
-  max-width: 800px;
+	text-align: center;
+	margin-bottom: 40px;
+	max-width: 800px;
 }
 
 .header-section h1 {
-  font-size: 2.2rem;
-  margin-bottom: 15px;
-  color: #1f1f1f;
+	font-size: 2.2rem;
+	margin-bottom: 15px;
+	color: #1f1f1f;
 }
 
 .list-comparison-grid {
-  display: flex;
-  justify-content: center; /* 确保卡片整体居中 */
-  gap: 20px;
-  width: 100%;
-  max-width: 2200px;
-  overflow-x: auto;
-  padding-bottom: 30px; /* 为滚动条预留空间 */
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	width: 100%;
+	max-width: 2200px;
+	overflow-x: auto;
+	padding-bottom: 30px;
 }
 
 /* 列表卡片 */
 .card {
-  flex: 0 0 380px; /* 强制固定宽度，防止在 5 个并排时冲突 */
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid #e8e8e8;
+	flex: 0 0 380px;
+	background: white;
+	border-radius: 16px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	border: 1px solid #e8e8e8;
 }
 
 /* 头部样式 */
 .card-title {
-  padding: 24px;
-  background: linear-gradient(to bottom, #ffffff, #fafafa);
-  border-bottom: 1px solid #f0f0f0;
-  min-height: 220px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+	padding: 24px;
+	background: linear-gradient(to bottom, #ffffff, #fafafa);
+	border-bottom: 1px solid #f0f0f0;
+	min-height: 220px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
 }
 
-/* 控制面板样式 */
 .control-panel {
-  margin-top: auto;
-  padding-top: 12px;
+	margin-top: auto;
+	padding-top: 12px;
 }
 
 .card-title h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+	margin: 0;
+	font-size: 1.3rem;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 /* 徽章样式 */
 .badge {
-  font-size: 0.7rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  text-transform: uppercase;
-  font-weight: bold;
+	font-size: 0.7rem;
+	padding: 2px 8px;
+	border-radius: 10px;
+	text-transform: uppercase;
+	font-weight: bold;
 }
 
 /* 分析盒样式 */
 .analysis-box {
-  background: #fff;
-  border-radius: 8px;
-  padding: 12px;
-  border: 1px solid #f0f0f0;
-  font-size: 0.85rem;
+	background: #fff;
+	border-radius: 8px;
+	padding: 12px;
+	border: 1px solid #f0f0f0;
+	font-size: 0.85rem;
 }
 
 .analysis-tag {
-  display: inline-block;
-  font-family: monospace;
-  font-weight: bold;
-  margin-bottom: 8px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #f5f5f5;
-  color: #666;
+	display: inline-block;
+	font-family: monospace;
+	font-weight: bold;
+	margin-bottom: 8px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: #f5f5f5;
+	color: #666;
 }
 
 .analysis-content {
-  line-height: 1.6;
-  color: #595959;
+	line-height: 1.6;
+	color: #595959;
 }
 
 .analysis-label {
-  font-weight: bold;
-  margin-right: 4px;
+	font-weight: bold;
+	margin-right: 4px;
 }
 .analysis-label.negative {
-  color: #ff4d4f;
+	color: #ff4d4f;
 }
 .analysis-label.positive {
-  color: #52c41a;
+	color: #52c41a;
 }
 
-/* 视口样式 */
 .list-viewport {
-  width: 100%;
-  height: 650px;
-  position: relative;
-  background-color: #fff;
+	width: 100%;
+	height: 650px;
+	position: relative;
+	background-color: #fff;
 }

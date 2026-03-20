@@ -1,24 +1,16 @@
-import "./index.css";
+import { useRef, useState } from "react";
 import "./App.css";
-import VirtualList from "./Components/VirtualList";
 import DynamicVirtualList from "./Components/DynamicVirtualList";
-import SegmentedVirtualList from "./Components/SegmentedVirtualList";
-import IncrementalVirtualList, {
-  IncrementalListRef,
-} from "./Components/IncrementalVirtualList";
 import EditableVirtualList, {
   EditableListRef,
 } from "./Components/EditableVirtualList";
-import { useState, useRef } from "react";
+import IncrementalVirtualList, {
+  IncrementalListRef,
+} from "./Components/IncrementalVirtualList";
+import SegmentedVirtualList from "./Components/SegmentedVirtualList";
+import VirtualList from "./Components/VirtualList";
+import { JumpAlign } from "./types/Enum";
 
-// 定义跳转对齐枚举
-enum JumpAlign {
-  START = "start",
-  CENTER = "center",
-  END = "end",
-}
-
-// 预设的一组随机文本，模拟真实业务中长短不一的内容
 const RANDOM_TEXTS = [
   "短小精悍。",
   "这是一段中等长度的描述文字，用于测试列表的撑开效果。",
@@ -28,11 +20,6 @@ const RANDOM_TEXTS = [
   "换行测试\n换行测试\n换行测试",
 ];
 
-/**
- * 【性能优化点 1】
- * 抽取数据生成逻辑到组件外部。
- * 这样即便是 App 组件因为输入框变动而重绘，这份数据生成逻辑也不会被重复执行。
- */
 const generateRandomData = (count: number) => {
   const data = [];
   for (let i = 0; i < count; i++) {
@@ -91,7 +78,7 @@ const App = () => {
               <div className="analysis-tag info">O(1) 数学定位</div>
               <div className="analysis-content">
                 <span className="analysis-label negative">缺点:</span>
-                高度定死，无法承开文本。但性能最高，计算最简单。
+                高度定死，无法承开高度。但性能最高，计算最简单。
               </div>
             </div>
             <div style={{ height: "38px", marginTop: "auto" }}></div>
@@ -113,7 +100,8 @@ const App = () => {
               <div className="analysis-tag info">测量 + O(n) 修正</div>
               <div className="analysis-content">
                 <span className="analysis-label negative">缺点:</span>
-                原生滚动异步性导致快速滑动白屏。修正算法难以支撑百万级。
+                原生滚动异步性导致快速滑动白屏。并且进度条不跟手,
+                修正算法难以支撑百万级。
               </div>
             </div>
             <div style={{ height: "38px", marginTop: "auto" }}></div>
@@ -287,7 +275,10 @@ const App = () => {
                 />
                 <button
                   onClick={() =>
-                    editableRef.current?.scrollToIndex(editJumpIndex, "start")
+                    editableRef.current?.scrollToIndex(
+                      editJumpIndex,
+                      JumpAlign.START,
+                    )
                   }
                   className="btn-jump"
                   style={{

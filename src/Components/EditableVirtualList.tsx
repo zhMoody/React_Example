@@ -9,6 +9,7 @@ import React, {
   useMemo,
 } from "react";
 import CustomScrollbar from "./CustomScrollbar";
+import { JumpAlign } from "../types/Enum";
 
 interface ListItem {
   id: number | string;
@@ -24,8 +25,8 @@ interface EditableVirtualListProps {
 }
 
 export interface EditableListRef {
-  scrollToIndex: (index: number, align?: "start" | "center" | "end") => void;
-  scrollToId: (id: string | number, align?: "start" | "center" | "end") => void;
+  scrollToIndex: (index: number, align?: JumpAlign) => void;
+  scrollToId: (id: string | number, align?: JumpAlign) => void;
   addItem: (index?: number) => void;
 }
 
@@ -68,7 +69,7 @@ const EditableVirtualList = forwardRef<
 
     const [pendingJump, setPendingJump] = useState<{
       targetId: string | number;
-      align: "start" | "center" | "end";
+      align: JumpAlign;
       count: number;
       originalIndex: number;
     } | null>(null);
@@ -169,7 +170,7 @@ const EditableVirtualList = forwardRef<
     );
 
     const scrollToId = useCallback(
-      (id: string | number, align: "start" | "center" | "end" = "start") => {
+      (id: string | number, align: JumpAlign = JumpAlign.START) => {
         if (segments.current.length === 0) rebuildSegments(listData);
         const pos = getPosById(id);
         if (pos) {
@@ -199,7 +200,7 @@ const EditableVirtualList = forwardRef<
     );
 
     const scrollToIndex = useCallback(
-      (index: number, align: "start" | "center" | "end" = "start") => {
+      (index: number, align: JumpAlign = JumpAlign.START) => {
         const item = listData[index];
         if (!item) return;
         scrollToId(item.id, align);

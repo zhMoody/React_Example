@@ -1,12 +1,13 @@
 import React, {
-  useState,
-  useRef,
-  useLayoutEffect,
+  forwardRef,
   useCallback,
   useImperativeHandle,
-  forwardRef,
+  useLayoutEffect,
+  useRef,
+  useState,
 } from "react";
 import CustomScrollbar from "./CustomScrollbar";
+import { JumpAlign } from "../types/Enum";
 
 /**
  * 【精准定位版】分片式虚拟列表
@@ -27,7 +28,7 @@ interface IncrementalVirtualListProps {
 }
 
 export interface IncrementalListRef {
-  scrollToIndex: (index: number, align?: "start" | "center" | "end") => void;
+  scrollToIndex: (index: number, align?: JumpAlign) => void;
   getScrollTop: () => number;
 }
 
@@ -63,10 +64,10 @@ const IncrementalVirtualList = forwardRef<
     const segments = useRef<Segment[]>([]);
     const lastDataLength = useRef(0);
 
-    // 【新增】用于二次校准的状态
+    // 用于二次校准的状态
     const [pendingJump, setPendingJump] = useState<{
       index: number;
-      align: "start" | "center" | "end";
+      align: JumpAlign;
       count: number; // 尝试校准的次数，通常 1-2 次即可完美对齐
     } | null>(null);
 
@@ -130,7 +131,7 @@ const IncrementalVirtualList = forwardRef<
      * 计算指定索引的理想滚动位置
      */
     const getTargetScrollTop = useCallback(
-      (index: number, align: "start" | "center" | "end") => {
+      (index: number, align: JumpAlign) => {
         const sIdx = Math.floor(index / segmentSize);
         const iIdx = index % segmentSize;
         const segment = segments.current[sIdx];
@@ -139,9 +140,9 @@ const IncrementalVirtualList = forwardRef<
         const item = segment.items[iIdx];
         let target = segment.top + item.top;
 
-        if (align === "center") {
+        if (align === JumpAlign.CENTER) {
           target -= (containerHeight - item.height) / 2;
-        } else if (align === "end") {
+        } else if (align === JumpAlign.END) {
           target -= containerHeight - item.height;
         }
         return target;
@@ -153,7 +154,7 @@ const IncrementalVirtualList = forwardRef<
      * 执行跳转
      */
     const scrollToIndex = useCallback(
-      (index: number, align: "start" | "center" | "end" = "start") => {
+      (index: number, align: JumpAlign = JumpAlign.START) => {
         const target = getTargetScrollTop(index, align);
         if (target !== null) {
           const maxST = phantomHeight - containerHeight;
@@ -169,7 +170,7 @@ const IncrementalVirtualList = forwardRef<
     /**
      * 【核心逻辑：自动对齐校准】
      * 当 pendingJump 存在时，每次组件重新渲染（通常是因为高度测量完毕），
-     * 我们都重新计算一遍目标位置。如果发现位置偏了，就再跳一次。
+     * 重新计算一遍目标位置。如果发现位置偏了，就再跳一次。
      */
     useLayoutEffect(() => {
       if (pendingJump) {
