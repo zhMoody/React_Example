@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import CustomScrollbar from "./CustomScrollbar";
 import { JumpAlign } from "../../types/Enum";
-import Button from "../common/Button";
+import Button, { ButtonSize, ButtonVariant } from "../common/Button";
 
 interface ListItem {
   id: number | string;
@@ -535,8 +535,8 @@ const EditableItem: React.FC<{
           </div>
           <div style={{ display: "flex", gap: "6px" }}>
             <Button
-              variant="secondary"
-              size="sm"
+              variant={ButtonVariant.Secondory}
+              size={ButtonSize.SM}
               onClick={() => onAdd(index)}
               style={{
                 padding: "3px 8px",
@@ -550,8 +550,8 @@ const EditableItem: React.FC<{
               + 插入
             </Button>
             <Button
-              variant="danger"
-              size="sm"
+              variant={ButtonVariant.Danger}
+              size={ButtonSize.SM}
               onClick={() => onDelete(index)}
               style={{
                 padding: "3px 8px",

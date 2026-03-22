@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
-import Menu from "./Menu/Menu";
 import "./Layout.css";
+import Menu from "./menu/Menu";
 
 const Layout = () => {
   return (
