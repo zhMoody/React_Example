@@ -9,7 +9,8 @@ import React, {
   useMemo,
 } from "react";
 import CustomScrollbar from "./CustomScrollbar";
-import { JumpAlign } from "../types/Enum";
+import { JumpAlign } from "../../types/Enum";
+import Button from "../common/Button";
 
 interface ListItem {
   id: number | string;
@@ -43,7 +44,7 @@ interface Segment {
   items: ItemPosition[];
 }
 
-const EditableVirtualList = forwardRef<
+export const EditableVirtualList = forwardRef<
   EditableListRef,
   EditableVirtualListProps
 >(
@@ -388,8 +389,8 @@ const EditableVirtualList = forwardRef<
           height: containerHeight,
           overflow: "hidden",
           position: "relative",
-          background: "#f8f9fa",
-          border: "1px solid #ddd",
+          background: "var(--bg-layout)",
+          border: "1px solid var(--border-color)",
         }}
       >
         <CustomScrollbar
@@ -493,8 +494,8 @@ const EditableItem: React.FC<{
         ref={nodeRef}
         style={{
           padding: "16px",
-          borderBottom: "1px solid #e0e0e0",
-          background: isFlashActive ? "#e6f7ff" : "#fff",
+          borderBottom: "1px solid var(--border-color)",
+          background: isFlashActive ? "#e6f7ff" : "var(--bg-card)",
           transition: "background 0.5s ease-out",
           display: "flex",
           flexDirection: "column",
@@ -511,8 +512,8 @@ const EditableItem: React.FC<{
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
             <span
               style={{
-                background: "#4A90E2",
-                color: "#fff",
+                background: "var(--accent-color)",
+                color: "var(--text-on-dark)",
                 padding: "1px 6px",
                 borderRadius: "3px",
                 fontSize: "11px",
@@ -523,7 +524,7 @@ const EditableItem: React.FC<{
             <span
               style={{
                 background: "#8e44ad",
-                color: "#fff",
+                color: "var(--text-on-dark)",
                 padding: "1px 6px",
                 borderRadius: "3px",
                 fontSize: "11px",
@@ -533,34 +534,33 @@ const EditableItem: React.FC<{
             </span>
           </div>
           <div style={{ display: "flex", gap: "6px" }}>
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={() => onAdd(index)}
               style={{
                 padding: "3px 8px",
                 fontSize: "11px",
-                cursor: "pointer",
-                background: "#f0f9eb",
-                border: "1px solid #c2e7b0",
                 color: "#67c23a",
-                borderRadius: "4px",
+                borderColor: "#c2e7b0",
+                background: "#f0f9eb",
+                minWidth: "auto",
               }}
             >
               + 插入
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
               onClick={() => onDelete(index)}
               style={{
                 padding: "3px 8px",
                 fontSize: "11px",
-                cursor: "pointer",
-                background: "#fef0f0",
-                border: "1px solid #fbc4c4",
-                color: "#f56c6c",
-                borderRadius: "4px",
+                minWidth: "auto",
               }}
             >
               删除
-            </button>
+            </Button>
           </div>
         </div>
         <textarea
@@ -573,8 +573,11 @@ const EditableItem: React.FC<{
           style={{
             width: "100%",
             padding: "10px 14px",
-            border: isFlashActive ? "1px solid #4A90E2" : "1px solid #dcdfe6",
+            border: isFlashActive
+              ? "1px solid var(--accent-color)"
+              : "1px solid var(--border-color)",
             borderRadius: "6px",
+            color: "var(--text-input)",
             fontSize: "14px",
             outline: "none",
             resize: "none",
@@ -591,5 +594,3 @@ const EditableItem: React.FC<{
     );
   },
 );
-
-export default EditableVirtualList;

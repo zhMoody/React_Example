@@ -1,0 +1,231 @@
+/* src/pages/pdf_render/PDF.css */
+
+.pdf-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: var(--bg-layout);
+  min-height: 100vh;
+}
+
+.pdf-header h1 {
+  color: var(--text-main);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.pdf-header p {
+  color: var(--text-subtle);
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.pdf-controls {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-main);
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.control-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.input-url {
+  flex: 1;
+  padding: 10px 16px;
+  background-color: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  outline: none;
+  transition: var(--transition-main);
+}
+
+.input-url:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color), transparent 80%);
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.preview-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-main);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+}
+
+.card-header {
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-main);
+}
+
+/* 优缺点提示区域 - 适配暗色 */
+.card-tips {
+  padding: 12px 20px;
+  background: color-mix(in srgb, var(--primary-color), transparent 92%);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.tip-item {
+  margin: 4px 0;
+}
+
+.tip-item.pro {
+  color: #10b981; /* Success Green */
+}
+
+.tip-item.con {
+  color: #ef4444; /* Danger Red */
+}
+
+.card-body {
+  height: 750px;
+  background: var(--bg-layout);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 插件预览内部 - 保持深色阅读器质感，但细节适配主题 */
+.plugin-viewer-container.modern-theme {
+  height: 100%;
+  background: #334155; /* 稍微柔和的暗板色 */
+  display: flex;
+  flex-direction: column;
+}
+
+.modern-toolbar {
+  background: var(--bg-sidebar); /* 使用侧边栏的深色背景 */
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-on-dark);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.scale-text {
+  font-size: 12px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.text-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+}
+
+.scroll-viewport {
+  flex: 1;
+  overflow: auto;
+  padding: 30px;
+}
+
+.page-item-container {
+  background: white; /* 模拟真实纸张永远是白的 */
+  margin: 0 auto 30px auto;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  position: relative;
+  width: fit-content;
+  display: block;
+}
+
+.page-label {
+  position: absolute;
+  right: -45px;
+  top: 10px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.native-viewer-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-state {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.btn-upload-label {
+  background: #10b981;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: var(--transition-main);
+}
+
+.btn-upload-label:hover {
+  filter: brightness(1.1);
+}
+
+.tag {
+  background: color-mix(in srgb, var(--primary-color), transparent 90%);
+  color: var(--primary-color);
+  border: 1px solid color-mix(in srgb, var(--primary-color), transparent 80%);
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+/* 滚动条美化 - 适配暗色背景 */
+.scroll-viewport::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll-viewport::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.1);
+}
+.scroll-viewport::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 5px;
+}
+.scroll-viewport::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}

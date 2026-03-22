@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 /doc_md
+.gemini/
+gha-creds-*.json

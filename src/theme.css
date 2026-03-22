@@ -1,0 +1,58 @@
+:root {
+  --transition-main: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* 统一动画曲线 */
+
+  /* --- 亮 --- */
+  --bg-layout: #f3f4f6;
+  --bg-card: #ffffff;
+  --bg-sidebar: #111827;
+  --bg-elevated: #ffffff;
+  --bg-input: #ffffff;
+
+  --text-main: #111827;
+  --text-subtle: #4b5563;
+  --text-muted: #9ca3af;
+  --text-on-dark: #f9fafb;
+  --text-input: #111827;
+
+  --primary-color: #6366f1;
+  --accent-color: var(--primary-color);
+
+  --border-color: #e5e7eb;
+  --shadow-main:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] {
+  /* --- 暗 --- */
+  --bg-layout: #030712;
+  --bg-card: #0f172a;
+  --bg-sidebar: #030712;
+  --bg-elevated: #1e293b;
+  --bg-input: #111827;
+
+  --text-main: #f9fafb;
+  --text-subtle: #9ca3af;
+  --text-muted: #6b7280;
+  --text-on-dark: #f9fafb;
+  --text-input: #f9fafb;
+
+  --primary-color: #818cf8;
+
+  --border-color: #1f2937;
+  --shadow-main: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  transition:
+    background-color var(--transition-main),
+    border-color var(--transition-main),
+    color var(--transition-main),
+    box-shadow var(--transition-main);
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-layout);
+  color: var(--text-main);
+}

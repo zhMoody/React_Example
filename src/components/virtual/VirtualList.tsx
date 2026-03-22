@@ -11,7 +11,7 @@ interface VirtualListProps {
   bufferCount: number;
 }
 
-const VirtualList: FC<VirtualListProps> = ({
+export const VirtualList: FC<VirtualListProps> = ({
   listData,
   itemHeight,
   containerHight,
@@ -43,6 +43,7 @@ const VirtualList: FC<VirtualListProps> = ({
         height: `${containerHight}px`,
         overflow: "auto",
         position: "relative",
+        background: "var(--bg-card)",
       }}
       onScroll={handleScroll}
     >
@@ -51,37 +52,39 @@ const VirtualList: FC<VirtualListProps> = ({
           height: `${listData.length * itemHeight}px`,
         }}
       ></div>
-      <div>
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            width: "100%",
-            transform: `translate3d(0, ${offset}px, 0)`,
-          }}
-        >
-          {renderData.map((item, index) => (
-            <div key={item.id} style={{ height: `${itemHeight}px` }}>
-              <div style={{ marginBottom: "8px" }}>
-                <span
-                  style={{
-                    background: "#4A90E2",
-                    color: "#fff",
-                    padding: "2px 8px",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                  }}
-                >
-                  INDEX: {index}
-                </span>
-              </div>
-              {item.content}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          width: "100%",
+          transform: `translate3d(0, ${offset}px, 0)`,
+        }}
+      >
+        {renderData.map((item, index) => (
+          <div
+            key={item.id}
+            style={{
+              height: `${itemHeight}px`,
+              background: "var(--bg-card)",
+            }}
+          >
+            <div style={{ marginBottom: "8px" }}>
+              <span
+                style={{
+                  background: "var(--accent-color)",
+                  color: "var(--text-on-dark)",
+                  padding: "2px 8px",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                }}
+              >
+                INDEX: {index}
+              </span>
             </div>
-          ))}
-        </div>
+            {item.content}
+          </div>
+        ))}
       </div>
     </div>
   );
 };
-
-export default VirtualList;

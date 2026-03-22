@@ -268,17 +268,17 @@ const Item: React.FC<{
       ref={nodeRef}
       style={{
         padding: "16px",
-        borderBottom: "1px solid #ddd",
+        borderBottom: "1px solid var(--border-color)",
         boxSizing: "border-box",
-        background: "#fff",
+        background: "var(--bg-card)",
         wordBreak: "break-all", // 核心：允许长文本换行，从而撑开动态高度
       }}
     >
       <div style={{ marginBottom: "8px" }}>
         <span
           style={{
-            background: "#4A90E2",
-            color: "#fff",
+            background: "var(--accent-color)",
+            color: "var(--text-on-dark)",
             padding: "2px 8px",
             borderRadius: "4px",
             fontSize: "12px",
@@ -287,7 +287,7 @@ const Item: React.FC<{
           INDEX: {index}
         </span>
       </div>
-      <div style={{ color: "#333", lineHeight: "1.5" }}>{content}</div>
+      <div style={{ color: "var(--text-main)", lineHeight: "1.5" }}>{content}</div>
     </div>
   );
 };

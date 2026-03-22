@@ -37,7 +37,7 @@ interface ItemPosition {
   bottom: number; // 相对于所属分片顶部的偏移
 }
 
-const SegmentedVirtualList: React.FC<SegmentedVirtualListProps> = ({
+export const SegmentedVirtualList: React.FC<SegmentedVirtualListProps> = ({
   listData,
   estimatedItemHeight = 50,
   containerHeight = 600,
@@ -222,7 +222,7 @@ const SegmentedVirtualList: React.FC<SegmentedVirtualListProps> = ({
         height: containerHeight,
         overflow: "hidden", // 禁用原生滚动
         position: "relative",
-        background: "#fff",
+        background: "var(--bg-layout)",
       }}
     >
       {/* 
@@ -285,16 +285,16 @@ const SegmentedItem: React.FC<{
       ref={nodeRef}
       style={{
         padding: "16px",
-        borderBottom: "1px solid #eee",
-        background: "#fff",
+        borderBottom: "1px solid var(--border-color)",
+        background: "var(--bg-card)",
         wordBreak: "break-all",
       }}
     >
       <div style={{ marginBottom: "8px" }}>
         <span
           style={{
-            background: "#4A90E2",
-            color: "#fff",
+            background: "var(--accent-color)",
+            color: "var(--text-on-dark)",
             padding: "2px 8px",
             borderRadius: "4px",
             fontSize: "12px",
@@ -303,9 +303,9 @@ const SegmentedItem: React.FC<{
           INDEX: {index}
         </span>
       </div>
-      <div style={{ color: "#333", lineHeight: "1.5" }}>{content}</div>
+      <div style={{ color: "var(--text-main)", lineHeight: "1.5" }}>
+        {content}
+      </div>
     </div>
   );
 };
-
-export default SegmentedVirtualList;

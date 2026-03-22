@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import CustomScrollbar from "./CustomScrollbar";
-import { JumpAlign } from "../types/Enum";
+import { JumpAlign } from "../../types/Enum";
 
 /**
  * 【精准定位版】分片式虚拟列表
@@ -45,7 +45,7 @@ interface ItemPosition {
   bottom: number;
 }
 
-const IncrementalVirtualList = forwardRef<
+export const IncrementalVirtualList = forwardRef<
   IncrementalListRef,
   IncrementalVirtualListProps
 >(
@@ -315,8 +315,8 @@ const IncrementalVirtualList = forwardRef<
           height: containerHeight,
           overflow: "hidden",
           position: "relative",
-          background: "#fff",
-          border: "1px solid #ddd",
+          background: "var(--bg-layout)",
+          border: "1px solid var(--border-color)",
         }}
       >
         <CustomScrollbar
@@ -367,16 +367,16 @@ const IncrementalItem: React.FC<{
       ref={nodeRef}
       style={{
         padding: "16px",
-        borderBottom: "1px solid #eee",
-        background: "#fff",
+        borderBottom: "1px solid var(--border-color)",
+        background: "var(--bg-card)",
         wordBreak: "break-all",
       }}
     >
       <div style={{ marginBottom: "4px" }}>
         <span
           style={{
-            background: "#4A90E2",
-            color: "#fff",
+            background: "var(--accent-color)",
+            color: "var(--text-on-dark)",
             padding: "1px 6px",
             borderRadius: "3px",
             fontSize: "11px",
@@ -385,11 +385,15 @@ const IncrementalItem: React.FC<{
           INDEX: {index}
         </span>
       </div>
-      <div style={{ color: "#333", fontSize: "14px", lineHeight: "1.4" }}>
+      <div
+        style={{
+          color: "var(--text-main)",
+          fontSize: "14px",
+          lineHeight: "1.4",
+        }}
+      >
         {content}
       </div>
     </div>
   );
 };
-
-export default IncrementalVirtualList;

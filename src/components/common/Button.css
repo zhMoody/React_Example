@@ -1,0 +1,98 @@
+.lab-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  outline: none;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+}
+
+/* --- Sizes --- */
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-md { padding: 10px 20px; font-size: 14px; }
+.btn-lg { padding: 14px 28px; font-size: 16px; }
+
+/* --- Variants --- */
+
+/* Primary: 使用 color-mix 实现极致细腻的悬停感 */
+.btn-primary {
+  background: var(--primary-color);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+/* 悬停：只混合 10% 的白色或黑色，保持色相一致 */
+.btn-primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--primary-color), white 10%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.btn-primary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--primary-color), black 5%);
+  transform: scale(0.98);
+}
+
+/* Secondary: 背景稍微变深/浅一点点 */
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--bg-layout);
+  border-color: color-mix(in srgb, var(--border-color), var(--text-main) 20%);
+}
+.btn-secondary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--bg-layout), black 5%);
+  transform: scale(0.98);
+}
+
+/* Danger: 细腻的红色渐变 */
+.btn-danger {
+  background: #ef4444;
+  color: #ffffff;
+}
+.btn-danger:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444, white 10%);
+}
+.btn-danger:active:not(:disabled) {
+  background: color-mix(in srgb, #ef4444, black 10%);
+}
+
+/* Ghost: 只有极其微弱的底色变化 */
+.btn-ghost {
+  background: transparent;
+  color: var(--text-subtle);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(128, 128, 128, 0.08);
+  color: var(--text-main);
+}
+
+/* --- States --- */
+
+.btn-disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  filter: grayscale(0.8);
+  pointer-events: none;
+}
+
+.btn-loader {
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
