@@ -7,9 +7,11 @@ import {
 // 1. 定义 Context 类型
 interface WatermarkConfig {
   text: string;
-  fontSize?: number;
-  opacity?: number;
-  gap?: number;
+  fontSize: number;
+  opacity: number;
+  gap: number;
+  color: string;
+  angle: number;
   mode: WatermarkMode;
 }
 
@@ -35,7 +37,9 @@ export const WatermarkProvider: React.FC<{ children: ReactNode }> = ({
     fontSize: 16,
     opacity: 0.15,
     gap: 100,
-    mode: "background", // 默认 background
+    color: "#000000",
+    angle: -30,
+    mode: "background",
   });
 
   const showWatermark = (newConfig?: Partial<WatermarkConfig>) => {
