@@ -26,3 +26,4 @@ dist-ssr
 /doc_md
 .gemini/
 gha-creds-*.json
+GEMINI.md
