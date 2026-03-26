@@ -6,6 +6,8 @@ import ThemeChange from "../pages/theme/ThemeChange";
 import { Screenshot } from "../pages/screenshot/ScreenShot";
 import { PDFRender } from "../pages/pdf_render/PDFRender";
 import { WaterMark } from "../pages/water_mark/WaterMark";
+import { User } from "../pages/user/user";
+import CanvasMonitor from "../pages/Canvas/CanvasMonitor";
 
 /**
  * 扩展官方 RouteObject 类型，增加自定义的属性
@@ -26,6 +28,12 @@ const route: AppRouteObject[] = [
         element: <Virtual />,
         id: "虚拟列表",
         icon: "🏠",
+      },
+      {
+        path: "/canvas",
+        element: <CanvasMonitor />,
+        id: "Canvas 异性选区",
+        icon: "🖼️",
       },
       {
         path: "/theme",
@@ -50,6 +58,12 @@ const route: AppRouteObject[] = [
         element: <WaterMark />,
         id: "水印",
         icon: "💧",
+      },
+      {
+        path: "/i18",
+        element: <User />,
+        id: "用户",
+        icon: "😎",
       },
     ],
   },

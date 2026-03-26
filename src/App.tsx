@@ -4,17 +4,19 @@ import { ThemeProvider } from "./context/ThemeContext";
 import "./theme.css";
 import "./App.css";
 
-import { WatermarkProvider } from './context/WatermarkContext';
+import { WatermarkProvider } from "./context/WatermarkContext";
+import { UserProvider } from "./context/UserContext";
 
 function App() {
   return (
     <ThemeProvider>
       <WatermarkProvider>
-        <RouterProvider router={router} />
+        <UserProvider>
+          <RouterProvider router={router} />
+        </UserProvider>
       </WatermarkProvider>
     </ThemeProvider>
   );
 }
-
 
 export default App;

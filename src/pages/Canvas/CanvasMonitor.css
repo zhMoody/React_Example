@@ -1,0 +1,117 @@
+.canvas-container {
+  width: 100%;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+  background-color: #121212;
+  /* 科技感点状网格背景 */
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.05) 1px,
+    transparent 1px
+  );
+  background-size: 30px 30px;
+  position: relative;
+  display: flex;
+  border-radius: 12px;
+}
+
+.monitor-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.floating-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  color: #fff;
+  pointer-events: auto; /* 允许交互，用于滚动列表 */
+  background: rgba(20, 20, 20, 0.85);
+  padding: 20px;
+  border-radius: 16px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  max-height: calc(100% - 40px);
+  overflow-y: auto;
+  z-index: 10;
+}
+
+/* 隐藏外层面板滚动条 */
+.floating-panel::-webkit-scrollbar {
+  width: 0;
+}
+
+.panel-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: #00bfff;
+  letter-spacing: 0.5px;
+}
+
+.status-info {
+  font-size: 13px;
+  opacity: 0.85;
+  line-height: 1.8;
+}
+
+.data-section {
+  margin-top: 15px;
+  font-size: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+}
+
+.section-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #00bfff;
+}
+
+.coordinate-list-container {
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.coordinate-item {
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.coord-label {
+  color: #aaa;
+  margin-bottom: 2px;
+}
+
+.coord-cad {
+  color: #00ff88;
+  font-weight: 500;
+}
+
+.guide-section {
+  margin-top: 15px;
+  font-size: 11px;
+  opacity: 0.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 12px;
+}
+
+.guide-item {
+  margin-bottom: 4px;
+}
+
+.upload-btn:hover {
+  background: rgba(0, 191, 255, 0.3) !important;
+  transform: translateY(-1px);
+}
+
+.upload-btn:active {
+  transform: translateY(0);
+}
