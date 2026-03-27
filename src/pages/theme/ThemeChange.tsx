@@ -11,6 +11,7 @@ import Button, {
   ButtonSize,
   ButtonVariant,
 } from "../../components/common/Button";
+import { useMemo } from "react";
 
 export const ThemeChange: React.FC = () => {
   const {
@@ -45,44 +46,44 @@ export const ThemeChange: React.FC = () => {
 
   const resetSingleColor = (key: keyof CustomThemeConfig) => {
     if (!isCustomMode) return;
-    const baseSource =
-      lastBasePreset === "dark" ? DARK_DEFAULTS : LIGHT_DEFAULTS;
+    const baseSource = lastBasePreset === "dark" ? DARK_DEFAULTS : LIGHT_DEFAULTS;
     setCustomConfig({ ...customConfig, [key]: baseSource[key] });
   };
 
   const getSelector = () => {
-    if (theme === ThemeMode.CUSTOM) return ":root /* Custom */";
-    if (resolvedTheme === "dark") return "[data-theme='dark']";
+    if (theme === ThemeMode.CUSTOM) return ":root /* 自定义模式 */";
+    if (resolvedTheme === "dark") return "[数据主题='暗色']";
     return ":root";
   };
+
+  const currentTime = useMemo(() => new Date().toLocaleTimeString(), []);
 
   return (
     <div className="theme-lab-page">
       <header className="theme-lab-header">
-        <h1>主题实验室</h1>
-        <p>自定义、实时预览、全量导出, 语义化css变量。</p>
+        <div className="lab-title-group">
+          <h1>主题视觉实验室.sys</h1>
+          <p>CSS 变量实时寻址、全量配置导出与语义化色彩矩阵管理。</p>
+        </div>
+        <div className="lab-status" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+          渲染引擎状态: 在线 // {currentTime}
+        </div>
       </header>
 
       <section className="sticky-mode-switcher">
         <div className="theme-switcher">
           {[
-            { mode: ThemeMode.SYSTEM, icon: "🖥️", label: "系统" },
-            { mode: ThemeMode.LIGHT, icon: "☀️", label: "明亮" },
-            { mode: ThemeMode.DARK, icon: "🌙", label: "深邃" },
-            { mode: ThemeMode.CUSTOM, icon: "🎨", label: "自定义" },
+            { mode: ThemeMode.SYSTEM, icon: "🖥️", label: "系统同步" },
+            { mode: ThemeMode.LIGHT, icon: "☀️", label: "明亮模式" },
+            { mode: ThemeMode.DARK, icon: "🌙", label: "暗色模式" },
+            { mode: ThemeMode.CUSTOM, icon: "🎨", label: "实验性自定义" },
           ].map((item) => (
             <Button
               key={item.mode}
-              variant={
-                theme === item.mode
-                  ? ButtonVariant.Secondory
-                  : ButtonVariant.Ghost
-              }
+              variant={theme === item.mode ? ButtonVariant.Secondory : ButtonVariant.Ghost}
               className={`theme-btn ${theme === item.mode ? "active" : ""}`}
               onClick={() => setTheme(item.mode)}
-              style={{ border: "none", boxShadow: "none" }}
             >
-              <span className="icon">{item.icon}</span>
               <span className="label">{item.label}</span>
             </Button>
           ))}
@@ -93,40 +94,19 @@ export const ThemeChange: React.FC = () => {
         <div className="lab-editor-pane">
           <div className="dashboard-card">
             <div className="card-header">
-              <h3 style={{ margin: 0 }}>色彩管理</h3>
-              <div
-                className="action-group"
-                style={{ display: "flex", alignItems: "center", gap: "15px" }}
-              >
-                <div className="base-preset-hint">
-                  复位基准:{" "}
-                  <span className={`preset-tag ${lastBasePreset}`}>
-                    {lastBasePreset === "dark" ? "深邃" : "明亮"}
-                  </span>
+              <h3>色彩参数矩阵管理</h3>
+              <div className="action-group" style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="base-preset-hint" style={{ fontSize: '0.7rem' }}>
+                  当前基准: <span className={`preset-tag ${lastBasePreset}`}>{lastBasePreset === "dark" ? "暗色" : "明亮"}</span>
                 </div>
-                <Button
-                  variant={ButtonVariant.Secondory}
-                  size={ButtonSize.SM}
-                  onClick={() => applyDefaults("light")}
-                  style={{ border: "1px solid var(--border-color)" }}
-                >
-                  导入明亮预设
-                </Button>
-                <Button
-                  variant={ButtonVariant.Secondory}
-                  size={ButtonSize.SM}
-                  onClick={() => applyDefaults("dark")}
-                  style={{ border: "1px solid var(--border-color)" }}
-                >
-                  导入深邃预设
-                </Button>
+                <Button variant={ButtonVariant.Secondory} size={ButtonSize.SM} onClick={() => applyDefaults("light")}>导入明亮预设</Button>
+                <Button variant={ButtonVariant.Secondory} size={ButtonSize.SM} onClick={() => applyDefaults("dark")}>导入暗色预设</Button>
               </div>
             </div>
 
             {!isCustomMode && (
               <div className="custom-hint">
-                💡 当前为预设模式，颜色不可修改。点击 <strong>自定义</strong>{" "}
-                模式开启编辑。
+                :: 系统提示: 当前处于预设只读模式。请在上方切换至 <strong>实验性自定义</strong> 模式以解锁参数编辑。
               </div>
             )}
 
@@ -134,43 +114,37 @@ export const ThemeChange: React.FC = () => {
               {Object.entries(currentDisplayConfig).map(([key, value]) => {
                 const k = key as keyof CustomThemeConfig;
                 return (
-                  <div
-                    className={`picker-item ${!isCustomMode ? "disabled" : ""}`}
-                    key={k}
-                  >
+                  <div className={`picker-item ${!isCustomMode ? "disabled" : ""}`} key={k}>
                     <div className="picker-label-row">
                       <div className="label-main">
-                        <span className="var-name">{k}</span>
                         <span className="var-desc">{THEME_METADATA[k]}</span>
+                        <span className="var-name">{k}</span>
                       </div>
                       {isCustomMode && (
                         <Button
                           variant={ButtonVariant.Ghost}
                           size={ButtonSize.SM}
-                          className="item-reset-btn"
                           onClick={() => resetSingleColor(k)}
-                          title={`恢复到最后导入的${lastBasePreset === "dark" ? "深邃" : "明亮"}预设`}
-                          style={{
-                            width: "24px",
-                            height: "24px",
-                            padding: 0,
-                            minWidth: "24px",
-                          }}
+                          title="恢复至当前基准值"
+                          style={{ padding: 0, minWidth: "24px", height: "24px", opacity: 0.5 }}
                         >
                           ↺
                         </Button>
                       )}
                     </div>
                     <div className="picker-control">
-                      <input
-                        type="color"
-                        value={value}
-                        disabled={!isCustomMode}
-                        onChange={(e) => handleColorChange(k, e.target.value)}
-                      />
+                      <div className="color-swatch-wrapper" style={{ backgroundColor: value }}>
+                        <input
+                          type="color"
+                          value={value}
+                          disabled={!isCustomMode}
+                          onChange={(e) => handleColorChange(k, e.target.value)}
+                        />
+                      </div>
                       <input
                         type="text"
-                        value={value}
+                        className="color-text-input"
+                        value={value.toUpperCase()}
                         disabled={!isCustomMode}
                         onChange={(e) => handleColorChange(k, e.target.value)}
                       />
@@ -183,44 +157,34 @@ export const ThemeChange: React.FC = () => {
         </div>
 
         <div className="lab-preview-pane">
-          <div className="sticky-preview-container">
-            <div className="dashboard-card code-section">
-              <div className="card-header">
-                <h3>导出配置</h3>
-                <Button
-                  size={ButtonSize.SM}
-                  onClick={() => {
-                    const cssText = `${getSelector()} {\n${Object.entries(
-                      currentDisplayConfig,
-                    )
-                      .map(([k, v]) => `  ${k}: ${v};`)
-                      .join("\n")}\n}`;
-                    navigator.clipboard.writeText(cssText);
-                    alert("配置已复制");
-                  }}
-                >
-                  复制 CSS
-                </Button>
+          <div className="dashboard-card code-section" style={{ height: '100%' }}>
+            <div className="card-header">
+              <h3>全量样式快照</h3>
+              <Button
+                size={ButtonSize.SM}
+                variant={ButtonVariant.Primary}
+                onClick={() => {
+                  const cssText = `${getSelector()} {\n${Object.entries(currentDisplayConfig).map(([k, v]) => `  ${k}: ${v};`).join("\n")}\n}`;
+                  navigator.clipboard.writeText(cssText);
+                  alert("CSS 配置已成功复制到剪贴板");
+                }}
+              >
+                复制配置
+              </Button>
+            </div>
+            <div className="theme-code-editor">
+              <div className="editor-header">
+                <div className="editor-filename">VISUAL_CONFIG_SNAPSHOT.css</div>
               </div>
-              <div className="theme-code-editor">
-                <div className="editor-header">
-                  <div className="editor-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+              <div className="editor-content">
+                <span className="editor-keyword">{getSelector()}</span> {"{"}
+                {Object.entries(currentDisplayConfig).map(([key, value]) => (
+                  <div key={key} className="editor-line">
+                    &nbsp;&nbsp;<span className="editor-var">{key}</span>:{" "}
+                    <span className="editor-val">{value}</span>;
                   </div>
-                  <div className="editor-filename">theme.css</div>
-                </div>
-                <div className="editor-content">
-                  <span className="editor-keyword">{getSelector()}</span> {"{"}
-                  {Object.entries(currentDisplayConfig).map(([key, value]) => (
-                    <div key={key} className="editor-line">
-                      <span className="editor-var">{key}</span>:{" "}
-                      <span className="editor-val">{value}</span>;
-                    </div>
-                  ))}
-                  {"}"}
-                </div>
+                ))}
+                {"}"}
               </div>
             </div>
           </div>
