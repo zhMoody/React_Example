@@ -2,7 +2,7 @@ import { Outlet } from "react-router";
 import "./Layout.css";
 import Menu from "./menu/Menu";
 
-const Layout = () => {
+export const Layout = () => {
   return (
     <div className="layout">
       <Menu />
@@ -14,5 +14,3 @@ const Layout = () => {
     </div>
   );
 };
-
-export default Layout;

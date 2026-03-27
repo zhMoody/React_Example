@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState, useMemo } from "react";
 import "./CanvasMonitor.css";
 import { SegmentedVirtualList } from "../../components/virtual/SegmentedVirtualList";
 import Button, {
@@ -19,7 +19,7 @@ interface VirtualPoint extends Point {
   insertIndex: number;
 }
 
-const CanvasMonitor: React.FC = () => {
+export const CanvasMonitor: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -466,5 +466,3 @@ const CanvasMonitor: React.FC = () => {
     </div>
   );
 };
-
-export default CanvasMonitor;

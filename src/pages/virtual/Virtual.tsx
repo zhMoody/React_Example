@@ -46,7 +46,7 @@ const generateRandomData = (count: number) => {
 // 全局单例数据源。所有的实验室卡片都共享这 10 万个对象的内存引用。
 const GLOBAL_DATA_SOURCE = generateRandomData(100000);
 
-const Virtual = () => {
+export const Virtual = () => {
   // 引用共享数据源
   const sharedListData = GLOBAL_DATA_SOURCE;
 
@@ -298,5 +298,3 @@ const Virtual = () => {
     </div>
   );
 };
-
-export default Virtual;

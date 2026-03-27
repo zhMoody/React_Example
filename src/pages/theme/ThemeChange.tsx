@@ -1,4 +1,3 @@
-import React from "react";
 import { ThemeMode } from "../../types/Enum";
 import {
   useTheme,
@@ -13,7 +12,7 @@ import Button, {
   ButtonVariant,
 } from "../../components/common/Button";
 
-const ThemeChange: React.FC = () => {
+export const ThemeChange: React.FC = () => {
   const {
     theme,
     setTheme,
@@ -230,5 +229,3 @@ const ThemeChange: React.FC = () => {
     </div>
   );
 };
-
-export default ThemeChange;
