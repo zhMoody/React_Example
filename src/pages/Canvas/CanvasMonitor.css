@@ -2,16 +2,13 @@
   width: 100%;
   height: calc(100vh - 48px);
   overflow: hidden;
-  background-color: #121212;
-  /* 科技感点状网格背景 */
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.05) 1px,
-    transparent 1px
-  );
-  background-size: 30px 30px;
+  background-color: #050505;
+  background-image: 
+    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+    radial-gradient(var(--border-color) 0.5px, transparent 0.5px);
+  background-size: 100% 4px, 40px 40px;
   position: relative;
   display: flex;
-  border-radius: 12px;
 }
 
 .monitor-canvas {
@@ -20,98 +17,157 @@
   height: 100%;
 }
 
+/* 浮动终端面板 */
 .floating-panel {
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 300px;
+  top: 24px;
+  right: 24px;
+  width: 320px;
+  background: rgba(10, 10, 10, 0.8);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px; /* 硬核直角圆角 */
+  padding: 0;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
   color: #fff;
-  pointer-events: auto; /* 允许交互，用于滚动列表 */
-  background: rgba(20, 20, 20, 0.85);
-  padding: 20px;
-  border-radius: 16px;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  max-height: calc(100% - 40px);
-  overflow-y: auto;
-  z-index: 10;
+  z-index: 100;
+  font-family: monospace;
 }
 
-/* 隐藏外层面板滚动条 */
-.floating-panel::-webkit-scrollbar {
-  width: 0;
+.panel-inner {
+  padding: 20px;
+}
+
+.panel-header {
+  background: rgba(99, 102, 241, 0.1);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--primary-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .panel-title {
-  font-size: 18px;
-  margin-bottom: 10px;
-  font-weight: 700;
-  color: #00bfff;
-  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--primary-color);
+  letter-spacing: 1px;
+  margin: 0;
 }
 
-.status-info {
-  font-size: 13px;
-  opacity: 0.85;
-  line-height: 1.8;
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }
 
 .data-section {
-  margin-top: 15px;
-  font-size: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 12px;
+  margin-top: 20px;
 }
 
 .section-title {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #00bfff;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.coordinate-list-container {
-  border-radius: 8px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
+.section-title::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
 }
 
+/* 坐标列表项打磨 */
 .coordinate-item {
-  padding: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 4px;
+  font-size: 0.8rem;
 }
 
 .coord-label {
-  color: #aaa;
-  margin-bottom: 2px;
-}
-
-.coord-cad {
-  color: #00ff88;
-  font-weight: 500;
-}
-
-.guide-section {
-  margin-top: 15px;
-  font-size: 11px;
-  opacity: 0.7;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding-top: 12px;
-}
-
-.guide-item {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 0.7rem;
   margin-bottom: 4px;
 }
 
-.upload-btn:hover {
-  background: rgba(0, 191, 255, 0.3) !important;
-  transform: translateY(-1px);
+.coord-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
 }
 
-.upload-btn:active {
-  transform: translateY(0);
+.coord-val {
+  color: #10b981;
+}
+
+.coord-cad {
+  color: #ef4444;
+  font-style: italic;
+}
+
+/* 操作指南 */
+.guide-section {
+  margin-top: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.guide-item {
+  font-size: 0.7rem;
+  color: var(--text-subtle);
+  margin-bottom: 6px;
+  display: flex;
+  gap: 8px;
+}
+
+/* HUD 实时坐标显示 */
+.hud-coords {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  border-left: 3px solid var(--primary-color);
+  padding: 8px 16px;
+  font-family: monospace;
+  pointer-events: none;
+}
+
+.hud-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.hud-value {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* 按钮打磨 */
+.lab-upload-btn {
+  margin: 20px;
+  width: calc(100% - 40px);
+  font-family: monospace;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 1px solid var(--primary-color) !important;
+  background: transparent !important;
+}
+
+.lab-upload-btn:hover {
+  background: var(--primary-color) !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px var(--primary-color);
 }

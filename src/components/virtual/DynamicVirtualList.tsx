@@ -293,16 +293,14 @@ const Item: React.FC<{
           }}
         ></div>
       </div>
-      <div
-        style={{
-          color: "#10b981",
-          fontFamily: "monospace",
-          fontSize: "13px",
-          lineHeight: "1.6",
-          opacity: 0.9,
-        }}
-      >
-        {`> ${content}`}
+      <div style={{ 
+        color: "#10b981", 
+        fontFamily: "monospace", 
+        fontSize: "13px",
+        lineHeight: "1.6",
+        opacity: 0.9
+      }}>
+        {`:: ${content}`}
       </div>
     </div>
   );
