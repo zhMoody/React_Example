@@ -2,7 +2,7 @@ import React, { useState, useRef, useLayoutEffect } from "react";
 
 /**
  * 【核心哲学：地图索引思想】
- * 在固定高度的列表中，我们靠“算”；在动态高度的列表中，我们靠“查表”。
+ * 在固定高度的列表中，靠“算”；在动态高度的列表中，靠“查表”。
  * 每一条数据在页面上的【起点、终点、高度】都会被记录在一张“地图”里（即 positions 数组）。
  */
 
@@ -15,7 +15,7 @@ interface ListItem {
 // 2. 定义组件接收的外部参数
 interface DynamicVirtualListProps {
   listData: ListItem[]; // 10万条原始数据源
-  estimatedItemHeight: number; // 预估高度：在还没测量出真实高度前，我们先“猜”一个值（如50px）
+  estimatedItemHeight: number; // 预估高度：在还没测量出真实高度前，先“猜”一个值（如50px）
   containerHeight: number; // 可视窗口高度：比如 600px，超过这个高度就出滚动条
   bufferCount: number; // 缓冲区：在可视区上下额外多画几条，防止滚动太快看到白屏
 }
@@ -38,22 +38,22 @@ const DynamicVirtualList: React.FC<DynamicVirtualListProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // 【状态】当前屏幕上能看到的第一个元素的索引
-  // 我们只用这个状态来控制重绘，因为滚动时它变了，才意味着我们需要换一批数据展示
+  // 只用这个状态来控制重绘，因为滚动时它变了，才意味着需要换一批数据展示
   const [start, setStart] = useState(0);
 
   /**
    * 【性能陷阱提示】
    * 为什么 positions 用 useRef 而不是 useState？
-   * 因为我们要频繁修改 10 万个位置信息。如果用 useState，每次修改哪怕一丁点，
+   * 因为要频繁修改 10 万个位置信息。如果用 useState，每次修改哪怕一丁点，
    * React 都会尝试去 Diff 这个巨大的数组，浏览器会瞬间卡死。
-   * useRef 允许我们直接修改内存里的数据，而不会惊动 React 的渲染引擎。
+   * useRef 允许直接修改内存里的数据，而不会惊动 React 的渲染引擎。
    */
   const positions = useRef<Position[]>([]);
 
   /**
    * 【步骤 1：初始化地图（盲猜阶段）】
-   * 既然还没开始画，我们不知道谁高谁矮，就假设大家都是 50px 高。
-   * 这样我们就能先算出每个人的 top 和 bottom，把滚动条的长度撑出来。
+   * 既然还没开始画，不知道谁高谁矮，就假设大家都是 50px 高。
+   * 这样就能先算出每个人的 top 和 bottom，把滚动条的长度撑出来。
    */
   const initPositions = () => {
     positions.current = listData.map((_, index) => ({
@@ -87,14 +87,14 @@ const DynamicVirtualList: React.FC<DynamicVirtualListProps> = ({
       const midBottom = positions.current[midIndex].bottom;
 
       if (midBottom === scrollTop) {
-        // 刚好对齐，那么下一项就是我们要找的起始项
+        // 刚好对齐，那么下一项就是要找的起始项
         return midIndex + 1;
       } else if (midBottom < scrollTop) {
         // 中间这项还在屏幕上方看不见的地方，往右边找
         left = midIndex + 1;
       } else {
         // 中间这项的底边已经超过了滚动高度，说明它可能就是起始项
-        // 但我们要追求完美，继续向左看还有没有更靠上的项也满足条件
+        // 但要追求完美，继续向左看还有没有更靠上的项也满足条件
         if (tempIndex === -1 || tempIndex > midIndex) {
           tempIndex = midIndex;
         }
@@ -106,7 +106,7 @@ const DynamicVirtualList: React.FC<DynamicVirtualListProps> = ({
 
   /**
    * 【步骤 3：滚动响应】
-   * 每当用户滚动，我们就去查“地图”，看看 start 索引变了没。
+   * 每当用户滚动，就去查“地图”，看看 start 索引变了没。
    */
   const handleScroll = () => {
     if (!containerRef.current) return;
@@ -123,7 +123,7 @@ const DynamicVirtualList: React.FC<DynamicVirtualListProps> = ({
 
   /**
    * 【步骤 4：确定渲染范围】
-   * 我们不能只画屏幕里的那几条，得加上缓冲区。
+   * 能只画屏幕里的那几条，得加上缓冲区。
    */
   // 粗略算下一屏能放几个（用预估高度算）
   const visibleCount = Math.ceil(containerHeight / estimatedItemHeight);
@@ -156,7 +156,7 @@ const DynamicVirtualList: React.FC<DynamicVirtualListProps> = ({
       item.bottom = item.top + height;
 
       // 2. 【连环修正】关键：因为我变高/矮了，我后面所有的邻居都要跟着往下/上挪动位置
-      // 我们从当前项的下一项开始，一直修正到 10 万项的末尾
+      // 从当前项的下一项开始，一直修正到 10 万项的末尾
       for (let i = index + 1; i < positions.current.length; i++) {
         // 这一项的起点 = 前一项的终点
         positions.current[i].top = positions.current[i - 1].bottom;
@@ -210,8 +210,8 @@ const DynamicVirtualList: React.FC<DynamicVirtualListProps> = ({
 
       {/* 
          【渲染层 List】
-         它装着我们真正看到的 DOM。它必须使用绝对定位。
-         通过 translate3d 我们把这一小块内容平移到用户当前的视线范围内。
+         它装着真正看到的 DOM。它必须使用绝对定位。
+         通过 translate3d 把这一小块内容平移到用户当前的视线范围内。
       */}
       <div
         style={{
@@ -244,23 +244,13 @@ const Item: React.FC<{
   content: string;
   onSizeChange: (index: number, height: number) => void;
 }> = ({ index, content, onSizeChange }) => {
-  // 引用当前项的 DOM 节点
   const nodeRef = useRef<HTMLDivElement>(null);
 
-  /**
-   * 【为什么用 useLayoutEffect？】
-   * 它在 DOM 更新后、浏览器“涂色”前同步执行。
-   * 如果我们在里面修正了位置，浏览器会直接画出修正后的结果。
-   * 如果用 useEffect，用户会先看到旧位置，然后看到闪跳。
-   */
   useLayoutEffect(() => {
     if (nodeRef.current) {
-      // getBoundingClientRect().height 获取的是带小数的精确像素高度
       const height = nodeRef.current.getBoundingClientRect().height;
-      // 测量完毕，上报给父组件去修改“地图”
       onSizeChange(index, height);
     }
-    // 依赖项包含内容和索引。只要文字变了，或者这一行被复用来展示别的数据了，就重新测量
   }, [content, index, onSizeChange]);
 
   return (
@@ -268,26 +258,52 @@ const Item: React.FC<{
       ref={nodeRef}
       style={{
         padding: "16px",
-        borderBottom: "1px solid var(--border-color)",
+        borderBottom: "1px solid #1a1a1a",
         boxSizing: "border-box",
-        background: "var(--bg-card)",
-        wordBreak: "break-all", // 核心：允许长文本换行，从而撑开动态高度
+        background: "#000",
+        wordBreak: "break-all",
       }}
     >
-      <div style={{ marginBottom: "8px" }}>
+      <div
+        style={{
+          marginBottom: "8px",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
+        }}
+      >
         <span
           style={{
-            background: "var(--accent-color)",
-            color: "var(--text-on-dark)",
-            padding: "2px 8px",
+            background: "rgba(99, 102, 241, 0.15)",
+            color: "var(--primary-color)",
+            padding: "2px 6px",
             borderRadius: "4px",
-            fontSize: "12px",
+            fontSize: "10px",
+            fontFamily: "monospace",
+            border: "1px solid rgba(99, 102, 241, 0.2)",
           }}
         >
-          INDEX: {index}
+          内存寻址: 0x{index.toString(16).toUpperCase().padStart(4, "0")}
         </span>
+        <div
+          style={{
+            height: "1px",
+            flex: 1,
+            background: "rgba(255,255,255,0.05)",
+          }}
+        ></div>
       </div>
-      <div style={{ color: "var(--text-main)", lineHeight: "1.5" }}>{content}</div>
+      <div
+        style={{
+          color: "#10b981",
+          fontFamily: "monospace",
+          fontSize: "13px",
+          lineHeight: "1.6",
+          opacity: 0.9,
+        }}
+      >
+        {`> ${content}`}
+      </div>
     </div>
   );
 };
