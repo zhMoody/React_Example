@@ -2,13 +2,9 @@
   width: 100%;
   height: calc(100vh - 48px);
   overflow: hidden;
-  background-color: #050505;
-  background-image:
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
-    radial-gradient(var(--border-color) 0.5px, transparent 0.5px);
-  background-size:
-    100% 4px,
-    40px 40px;
+  background-color: #0f1115; /* 更高级的深灰黑 */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
   position: relative;
   display: flex;
 }
@@ -19,156 +15,187 @@
   height: 100%;
 }
 
-/* 浮动终端面板 */
+/* 极简浮动面板 */
 .floating-panel {
   position: absolute;
   top: 24px;
   right: 24px;
-  width: 320px;
-  background: rgba(10, 10, 10, 0.8);
-  border: 1px solid var(--primary-color);
-  border-radius: 4px;
+  width: 340px;
+  background: rgba(15, 17, 21, 0.85);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
   padding: 0;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
-  color: #fff;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+  color: var(--text-main);
   z-index: 100;
-}
-
-.panel-inner {
-  padding: 20px;
+  overflow: hidden;
 }
 
 .panel-header {
-  background: rgba(99, 102, 241, 0.1);
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--primary-color);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .panel-title {
-  font-size: 0.9rem;
-  font-weight: 900;
-  color: var(--primary-color);
-  letter-spacing: 1px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-on-dark);
+  letter-spacing: 0.025em;
   margin: 0;
 }
 
 .status-indicator {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 8px #10b981;
+  background: var(--success-color);
+  box-shadow: 0 0 10px var(--success-color);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.panel-inner {
+  padding: 20px;
+}
+
+.status-info {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
 }
 
 .data-section {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .section-title {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .section-title::after {
   content: "";
   height: 1px;
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--border-color);
+  opacity: 0.3;
 }
 
-/* 坐标列表项打磨 */
+/* 坐标列表项 */
 .coordinate-item {
-  padding: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.02);
   margin-bottom: 4px;
-  font-size: 0.8rem;
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .coord-label {
   color: var(--primary-color);
-  font-weight: bold;
-  font-size: 0.7rem;
+  font-weight: 700;
+  font-size: 0.65rem;
   margin-bottom: 4px;
+  text-transform: uppercase;
 }
 
 .coord-row {
   display: flex;
   justify-content: space-between;
+  font-size: 0.75rem;
   margin-bottom: 2px;
+  color: var(--text-subtle);
 }
 
 .coord-val {
-  color: #10b981;
+  color: var(--info-color);
+  font-weight: 600;
 }
 
 .coord-cad {
-  color: #ef4444;
-  font-style: italic;
+  color: var(--success-color);
+  font-weight: 600;
 }
 
 /* 操作指南 */
 .guide-section {
-  margin-top: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 12px;
-  border-radius: 4px;
+  margin-top: 24px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .guide-item {
-  font-size: 0.7rem;
-  color: var(--text-subtle);
-  margin-bottom: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* HUD 实时坐标显示 */
+.guide-item span {
+  color: var(--primary-color);
+  font-weight: 700;
+  min-width: 50px;
+}
+
+.guide-item:last-child {
+  margin-bottom: 0;
+}
+
+/* HUD 实时显示 */
 .hud-coords {
   position: absolute;
   bottom: 24px;
   left: 24px;
-  background: rgba(0, 0, 0, 0.6);
-  border-left: 3px solid var(--primary-color);
-  padding: 8px 16px;
-  font-family: monospace;
+  background: rgba(15, 17, 21, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-family: ui-monospace, monospace;
   pointer-events: none;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 .hud-label {
   font-size: 0.65rem;
   color: var(--text-muted);
-  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
 }
 
 .hud-value {
-  font-size: 1.1rem;
-  color: #fff;
-  font-weight: bold;
+  font-size: 1.25rem;
+  color: var(--text-on-dark);
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
-/* 按钮打磨 */
+/* 按钮适配 */
 .lab-upload-btn {
-  margin: 20px;
-  width: calc(100% - 40px);
-  font-family: monospace;
-  font-weight: 700;
-  letter-spacing: 1px;
-  border: 1px solid var(--primary-color) !important;
-  background: transparent !important;
+  margin-top: 24px;
+  width: 100%;
+  font-weight: 600 !important;
+  letter-spacing: 0.025em;
 }
 
-.lab-upload-btn:hover {
-  background: var(--primary-color) !important;
-  color: #fff !important;
-  box-shadow: 0 0 15px var(--primary-color);
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
 }

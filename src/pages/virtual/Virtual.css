@@ -1,5 +1,5 @@
 .virtual-lab {
-  padding: 40px;
+  padding: 40px 24px;
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -10,43 +10,51 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  border-bottom: 2px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 24px;
 }
 
 .lab-title-group h1 {
-  font-size: 2.5rem;
-  font-weight: 900;
+  font-size: 2.25rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
+}
+
+.lab-title-group p {
+  color: var(--text-subtle);
   margin: 0;
-  letter-spacing: -1px;
-  background: linear-gradient(135deg, var(--text-main), var(--primary-color));
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1rem;
 }
 
 .lab-status {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.8rem;
-  color: var(--text-subtle);
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 8px 16px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
-  background: #10b981;
+  background: var(--success-color);
   border-radius: 50%;
-  box-shadow: 0 0 10px #10b981;
-  animation: pulse 2s infinite;
+  box-shadow: 0 0 8px var(--success-color);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 /* Grid Layout */
 .lab-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-  gap: 48px; /* 增加间隙，作为外层页面的“安全滚动区” */
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: 32px;
   padding-bottom: 60px;
 }
 
@@ -54,7 +62,7 @@
 .lab-module {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -64,14 +72,13 @@
 
 .lab-module:hover {
   border-color: var(--primary-color);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
-  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.1);
 }
 
 .module-header {
   padding: 24px;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(var(--primary-color-rgb), 0.02);
+  background: linear-gradient(to bottom right, var(--bg-card), var(--bg-layout));
 }
 
 .module-meta {
@@ -82,62 +89,70 @@
 }
 
 .module-no {
-  font-family: monospace;
+  font-family: ui-monospace, monospace;
   font-weight: 700;
   color: var(--primary-color);
-  font-size: 0.75rem;
-  background: rgba(99, 102, 241, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
+  font-size: 0.7rem;
+  background: var(--info-bg);
+  padding: 2px 10px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .module-complexity {
-  font-family: monospace;
-  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.7rem;
   color: var(--text-muted);
 }
 
 .module-title h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
-  font-weight: 800;
+  margin: 0 0 6px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .module-desc {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: var(--text-subtle);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 /* Analysis Info Box */
 .module-analysis {
   margin-top: 16px;
-  padding: 12px;
+  padding: 12px 16px;
   background: var(--bg-layout);
   border-radius: 8px;
   font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .analysis-label {
   font-weight: 700;
   margin-right: 8px;
   text-transform: uppercase;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.025em;
 }
 
 .label-pos {
-  color: #10b981;
+  color: var(--success-color);
 }
 .label-neg {
-  color: #ef4444;
+  color: var(--danger-color);
 }
 
 /* Viewport Area */
 .module-viewport {
   flex: 1;
-  background: #000; /* 模拟深色终端感 */
+  background: #0a0a0a; /* 更深邃的黑 */
   position: relative;
   overflow: hidden;
+  min-height: 400px;
 }
 
 /* 核心修复：滚动隔离 */
@@ -147,7 +162,7 @@
 
 /* 内部滚动条打磨 */
 .module-viewport > div::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .module-viewport > div::-webkit-scrollbar-track {
@@ -155,14 +170,15 @@
 }
 
 .module-viewport > div::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #262626;
   border-radius: 10px;
 }
 
 .module-viewport > div::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
+  background: #404040;
 }
 
+/* 极简扫描线 */
 .module-viewport::after {
   content: "";
   position: absolute;
@@ -170,19 +186,14 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background:
-    linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
-    linear-gradient(
-      90deg,
-      rgba(255, 0, 0, 0.02),
-      rgba(0, 255, 0, 0.01),
-      rgba(0, 0, 255, 0.02)
-    );
-  background-size:
-    100% 4px,
-    3px 100%;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.05) 50%
+  );
+  background-size: 100% 4px;
   pointer-events: none;
   z-index: 10;
+  opacity: 0.5;
 }
 
 /* Control Panel */
@@ -201,7 +212,7 @@
   color: var(--text-main);
   padding: 8px 12px;
   border-radius: 8px;
-  font-family: monospace;
+  font-family: ui-monospace, monospace;
   font-size: 0.85rem;
   width: 100px;
   transition: all 0.2s;
@@ -210,7 +221,7 @@
 .lab-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px var(--info-bg);
 }
 
 .align-group {
@@ -219,19 +230,21 @@
   padding: 4px;
   border-radius: 10px;
   margin-left: auto;
+  gap: 2px;
 }
 
 @keyframes pulse {
-  0% {
+  0%, 100% {
     opacity: 1;
-    transform: scale(1);
   }
   50% {
-    opacity: 0.5;
-    transform: scale(1.2);
+    opacity: 0.3;
   }
-  100% {
-    opacity: 1;
-    transform: scale(1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .lab-grid {
+    grid-template-columns: 1fr;
   }
 }

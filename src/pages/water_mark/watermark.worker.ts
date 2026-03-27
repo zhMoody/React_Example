@@ -28,5 +28,5 @@ self.onmessage = (e: MessageEvent) => {
     }
   }
 
-  self.postMessage({ imageData }, [imageData.data.buffer] as any);
+  self.postMessage({ imageData }, [imageData.data.buffer]);
 };

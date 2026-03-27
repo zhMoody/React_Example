@@ -1,5 +1,5 @@
 import { FC, useState, useEffect } from "react";
-import Button, { ButtonVariant } from "../../components/common/Button";
+import Button, { ButtonVariant, ButtonSize } from "../../components/common/Button";
 import { xhrRequest } from "./XHRRequest";
 import { fetchRequest } from "./Fetch";
 import "./Progress.css";
@@ -73,6 +73,7 @@ export const Progress: FC = () => {
                 variant={ButtonVariant.Primary}
                 onClick={() => handleDownload("xhr")}
                 disabled={isLoading}
+                size={ButtonSize.LG}
               >
                 XHR 加载
               </Button>
@@ -97,6 +98,7 @@ export const Progress: FC = () => {
                 variant={ButtonVariant.Secondory}
                 onClick={() => handleDownload("fetch")}
                 disabled={isLoading}
+                size={ButtonSize.LG}
               >
                 Fetch 加载
               </Button>

@@ -293,9 +293,11 @@ export const CanvasMonitor: React.FC = () => {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim() || '#4f46e5';
+
     ctx.beginPath();
     ctx.setLineDash([5, 5]);
-    ctx.strokeStyle = "rgba(99, 102, 241, 0.3)";
+    ctx.strokeStyle = "rgba(128, 128, 128, 0.2)";
     ctx.moveTo(0, mousePos.y); ctx.lineTo(canvas.width, mousePos.y);
     ctx.moveTo(mousePos.x, 0); ctx.lineTo(mousePos.x, canvas.height);
     ctx.stroke();
@@ -317,9 +319,9 @@ export const CanvasMonitor: React.FC = () => {
       
       if (points.length >= 3) {
         ctx.closePath();
-        ctx.fillStyle = `rgba(99, 102, 241, ${scanAlpha})`;
+        ctx.fillStyle = `rgba(79, 70, 229, ${scanAlpha})`;
         ctx.fill();
-        ctx.strokeStyle = "var(--primary-color)";
+        ctx.strokeStyle = primaryColor;
       } else {
         ctx.strokeStyle = "#ffcc00";
       }
@@ -330,7 +332,7 @@ export const CanvasMonitor: React.FC = () => {
       points.forEach((p, i) => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, 6 / scale, 0, Math.PI * 2);
-        ctx.fillStyle = selectedIndex === i ? "var(--primary-color)" : "#fff";
+        ctx.fillStyle = selectedIndex === i ? primaryColor : "#fff";
         ctx.fill();
         ctx.strokeStyle = "#1a1a1a";
         ctx.lineWidth = 2 / scale;
@@ -339,7 +341,7 @@ export const CanvasMonitor: React.FC = () => {
         if (selectedIndex === i) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, 10 / scale, 0, Math.PI * 2);
-          ctx.strokeStyle = "rgba(99, 102, 241, 0.5)";
+          ctx.strokeStyle = `rgba(79, 70, 229, 0.5)`;
           ctx.lineWidth = 1 / scale;
           ctx.stroke();
         }
@@ -350,7 +352,7 @@ export const CanvasMonitor: React.FC = () => {
         ctx.arc(vp.x, vp.y, 4 / scale, 0, Math.PI * 2);
         ctx.fillStyle = "#fff";
         ctx.fill();
-        ctx.strokeStyle = "var(--primary-color)";
+        ctx.strokeStyle = primaryColor;
         ctx.lineWidth = 1.5 / scale;
         ctx.stroke();
       });
@@ -360,7 +362,7 @@ export const CanvasMonitor: React.FC = () => {
 
   const currentImgPos = toImageSpace(mousePos.x, mousePos.y);
 
-  const renderCoordinateItem = (item: any) => (
+  const renderCoordinateItem = (item: { index: number; x: number; y: number }) => (
     <div className="coordinate-item">
       <div className="coord-label">顶点索引: 0x{item.index.toString(16).toUpperCase().padStart(2, '0')}</div>
       <div className="coord-row">

@@ -70,7 +70,7 @@ export const Screenshot: React.FC = () => {
         stream.getTracks().forEach((t) => t.stop());
         setLoading(false);
       }, 800);
-    } catch (e) {
+    } catch {
       setLoading(false);
     }
   };
