@@ -2,7 +2,6 @@
   padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
-  font-family: monospace;
 }
 
 /* 顶部状态栏 */
@@ -20,7 +19,7 @@
   font-weight: 900;
   margin: 0;
   background: linear-gradient(135deg, var(--text-main), var(--primary-color));
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -206,9 +205,15 @@
   line-height: 1.8;
 }
 
-.editor-var { color: #818cf8; }
-.editor-val { color: #10b981; }
-.editor-keyword { color: #f472b6; }
+.editor-var {
+  color: #818cf8;
+}
+.editor-val {
+  color: #10b981;
+}
+.editor-keyword {
+  color: #f472b6;
+}
 
 /* 辅助标签 */
 .preset-tag {
@@ -219,8 +224,14 @@
   font-weight: 900;
 }
 
-.preset-tag.dark { background: #1e293b; color: #38bdf8; }
-.preset-tag.light { background: #f1f5f9; color: #6366f1; }
+.preset-tag.dark {
+  background: #1e293b;
+  color: #38bdf8;
+}
+.preset-tag.light {
+  background: #f1f5f9;
+  color: #6366f1;
+}
 
 .custom-hint {
   margin: 24px 24px 0 24px;

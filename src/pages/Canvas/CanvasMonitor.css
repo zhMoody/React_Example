@@ -3,10 +3,12 @@
   height: calc(100vh - 48px);
   overflow: hidden;
   background-color: #050505;
-  background-image: 
+  background-image:
     linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
     radial-gradient(var(--border-color) 0.5px, transparent 0.5px);
-  background-size: 100% 4px, 40px 40px;
+  background-size:
+    100% 4px,
+    40px 40px;
   position: relative;
   display: flex;
 }
@@ -25,13 +27,12 @@
   width: 320px;
   background: rgba(10, 10, 10, 0.8);
   border: 1px solid var(--primary-color);
-  border-radius: 4px; /* 硬核直角圆角 */
+  border-radius: 4px;
   padding: 0;
   backdrop-filter: blur(10px);
   box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
   color: #fff;
   z-index: 100;
-  font-family: monospace;
 }
 
 .panel-inner {

@@ -1,231 +1,293 @@
-/* src/pages/pdf_render/PDF.css */
-
 .pdf-container {
-  padding: 24px;
+  padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: var(--bg-layout);
-  min-height: 100vh;
+}
+
+/* 头部统一 */
+.pdf-header {
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 20px;
 }
 
 .pdf-header h1 {
-  color: var(--text-main);
-  text-align: center;
-  margin-bottom: 8px;
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--text-main), var(--primary-color));
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.pdf-header p {
-  color: var(--text-subtle);
-  text-align: center;
-  margin-bottom: 30px;
-}
-
+/* 数据加载入口矩阵 */
 .pdf-controls {
   background: var(--bg-card);
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-main);
-  margin-bottom: 30px;
+  border: 1px solid var(--border-color);
+  padding: 24px 32px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 48px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.control-group {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  border: 1px solid var(--border-color);
 }
 
 .control-label {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-main);
-  margin-bottom: 8px;
-  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-label::before {
+  content: "::";
+  opacity: 0.5;
 }
 
 .control-row {
   display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 12px;
 }
 
 .input-url {
   flex: 1;
-  padding: 10px 16px;
-  background-color: var(--bg-input);
-  color: var(--text-main);
+  background: var(--bg-input);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  color: var(--text-main);
+  padding: 10px 14px;
+  height: 38px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  border-radius: 4px;
   outline: none;
-  transition: var(--transition-main);
+  transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .input-url:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color), transparent 80%);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.btn-upload-label {
+  background: var(--bg-layout);
+  border: 1px dashed var(--primary-color);
+  color: var(--primary-color);
+  padding: 0 20px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: 4px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.btn-upload-label:hover {
+  background: rgba(99, 102, 241, 0.05);
+  border-style: solid;
+}
+
+.file-ident-tag {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-color);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 模块卡片 */
 .preview-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 32px;
 }
 
-.preview-card {
+.lab-module {
   background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow-main);
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border-color);
+  height: 700px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
-.card-header {
-  padding: 16px 20px;
-  background: var(--bg-elevated);
+.module-header {
+  padding: 16px 24px;
   border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: rgba(var(--primary-color-rgb), 0.02);
 }
 
-.card-header h3 {
-  margin: 0;
-  font-size: 15px;
-  color: var(--text-main);
+.module-no {
+  font-family: monospace;
+  font-weight: 900;
+  color: var(--primary-color);
+  font-size: 0.7rem;
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
-/* 优缺点提示区域 - 适配暗色 */
+.module-title h3 {
+  margin: 8px 0 0 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
 .card-tips {
-  padding: 12px 20px;
-  background: color-mix(in srgb, var(--primary-color), transparent 92%);
-  border-bottom: 1px solid var(--border-color);
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.tip-item {
-  margin: 4px 0;
-}
-
-.tip-item.pro {
-  color: #10b981; /* Success Green */
-}
-
-.tip-item.con {
-  color: #ef4444; /* Danger Red */
-}
-
-.card-body {
-  height: 750px;
+  padding: 12px 24px;
   background: var(--bg-layout);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.7rem;
+  line-height: 1.6;
+  color: var(--text-subtle);
+}
+
+/* 视口 */
+.module-viewport {
+  flex: 1;
+  background: var(--bg-sidebar);
   position: relative;
   overflow: hidden;
-}
-
-/* 插件预览内部 - 保持深色阅读器质感，但细节适配主题 */
-.plugin-viewer-container.modern-theme {
-  height: 100%;
-  background: #334155; /* 稍微柔和的暗板色 */
   display: flex;
   flex-direction: column;
 }
 
+/* 插件工具栏重构 */
 .modern-toolbar {
-  background: var(--bg-sidebar); /* 使用侧边栏的深色背景 */
-  padding: 8px 16px;
+  background: rgba(10, 10, 10, 0.95);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--primary-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--text-on-dark);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  z-index: 20;
+  backdrop-filter: blur(10px);
+}
+
+.toolbar-controls {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 2px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .scale-text {
-  font-size: 12px;
-  min-width: 40px;
+  font-size: 0.7rem;
+  color: var(--primary-color);
+  min-width: 45px;
   text-align: center;
+  font-weight: 900;
+  font-family: monospace;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .text-toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  border-radius: 4px;
   cursor: pointer;
-  user-select: none;
-  font-size: 12px;
+  transition: all 0.2s;
 }
 
+.text-toggle:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.text-toggle span {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.page-count {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+/* 滚动视口 */
 .scroll-viewport {
   flex: 1;
+  padding: 32px;
   overflow: auto;
-  padding: 30px;
+  overscroll-behavior: contain;
 }
 
 .page-item-container {
-  background: white; /* 模拟真实纸张永远是白的 */
-  margin: 0 auto 30px auto;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background: #fff;
+  margin: 0 auto 32px auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   position: relative;
-  width: fit-content;
-  display: block;
 }
 
 .page-label {
   position: absolute;
-  right: -45px;
-  top: 10px;
-  color: var(--text-muted);
-  font-size: 11px;
+  left: -45px;
+  top: 0;
+  font-size: 0.6rem;
+  color: var(--primary-color);
+  font-weight: 900;
+  opacity: 0.6;
 }
 
-.native-viewer-wrapper {
-  width: 100%;
-  height: 100%;
-}
-
-.empty-state {
-  height: 100%;
+.modern-loader {
   display: flex;
+  height: 100%;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
-}
-
-.btn-upload-label {
-  background: #10b981;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  transition: var(--transition-main);
-}
-
-.btn-upload-label:hover {
-  filter: brightness(1.1);
-}
-
-.tag {
-  background: color-mix(in srgb, var(--primary-color), transparent 90%);
   color: var(--primary-color);
-  border: 1px solid color-mix(in srgb, var(--primary-color), transparent 80%);
-  padding: 2px 10px;
-  border-radius: 6px;
-  font-size: 12px;
+  font-size: 0.8rem;
+  animation: pulse 2s infinite;
 }
 
-/* 滚动条美化 - 适配暗色背景 */
-.scroll-viewport::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-.scroll-viewport::-webkit-scrollbar-track {
-  background: rgba(0,0,0,0.1);
-}
-.scroll-viewport::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.2);
-  border-radius: 5px;
-}
-.scroll-viewport::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.3);
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
