@@ -31,7 +31,6 @@ export const Screenshot: React.FC = () => {
     localStorage.setItem("shot-history-simple", JSON.stringify(newHistory));
   };
 
-  // html2canvas 局部截图
   const captureStage = async () => {
     if (!stageRef.current) return;
     setLoading(true);
@@ -40,20 +39,6 @@ export const Screenshot: React.FC = () => {
         useCORS: true,
         scale: 2,
         backgroundColor: null,
-        onclone: (clonedDoc) => {
-          const el = clonedDoc.getElementById("capture-stage");
-          if (el) {
-            const elements = el.getElementsByTagName("*");
-            for (let i = 0; i < elements.length; i++) {
-              const item = elements[i] as HTMLElement;
-              const style = window.getComputedStyle(item);
-              if (style.color) item.style.color = style.color;
-              if (style.backgroundColor)
-                item.style.backgroundColor = style.backgroundColor;
-              if (style.borderColor) item.style.borderColor = style.borderColor;
-            }
-          }
-        },
       });
       const url = canvas.toDataURL("image/png");
       setImgUrl(url);
@@ -65,12 +50,9 @@ export const Screenshot: React.FC = () => {
     }
   };
 
-  //  浏览器录制 (全屏截图)
   const captureFullScreen = async () => {
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-      });
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
       setLoading(true);
       const video = document.createElement("video");
       video.srcObject = stream;
@@ -93,13 +75,12 @@ export const Screenshot: React.FC = () => {
     }
   };
 
-  // 通用动作
   const copyToClipboard = async () => {
     if (!imgUrl) return;
     const res = await fetch(imgUrl);
     const blob = await res.blob();
     await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-    alert("已复制到剪贴板");
+    alert("像素数据已复制到剪贴板");
   };
 
   const downloadImage = () => {
@@ -113,74 +94,81 @@ export const Screenshot: React.FC = () => {
   return (
     <div className="simple-shot-container">
       <header className="shot-header">
-        <h1>像素实验室</h1>
+        <div className="lab-title-group">
+          <h1>数字资产捕获终端.sys</h1>
+          <p>基于像素寻址的 DOM 序列化与全屏视频流捕获引擎。</p>
+        </div>
         <div className="engine-bar">
           <Button
             variant={ButtonVariant.Primary}
             onClick={captureStage}
             loading={loading}
+            icon="📸"
           >
-            📷 html2canvas 局部截图
+            执行局部采样
           </Button>
-          <Button variant={ButtonVariant.Secondory} onClick={captureFullScreen}>
-            🖥️ 视频录制全屏截图
+          <Button 
+            variant={ButtonVariant.Secondory} 
+            onClick={captureFullScreen}
+            icon="🎞️"
+          >
+            捕获全屏视频流
           </Button>
         </div>
       </header>
 
       <main className="shot-main">
         <section className="stage-section">
-          <div className="label">采集对象</div>
-          <div className="capture-box" ref={stageRef} id="capture-stage">
-            <div className="lab-card">
+          <div className="section-label">采集舞台 :: THE_STAGE</div>
+          <div className="capture-box" id="capture-stage">
+            <div className="lab-card" ref={stageRef}>
               <div className="lab-card-header">
                 <span className="dot red"></span>
                 <span className="dot yellow"></span>
                 <span className="dot green"></span>
               </div>
               <div className="lab-card-body">
-                <h2>像素分析仪</h2>
+                <h2>像素分析报告</h2>
                 <p>
-                  正在测试 CSS
-                  变量穿透。所有的背景色、边框色和文字颜色均由当前主题变量控制，能够被截图引擎准确识别。
+                  当前系统正在进行 CSS 变量穿透测试。所有的色彩深度、透明度及边框定义均遵循实验室全局协议。
                 </p>
-                <div className="status-badge">READY TO CAPTURE</div>
+                <div className="status-badge">采样就绪 (READY)</div>
               </div>
             </div>
           </div>
         </section>
 
         <section className="preview-section">
-          <div className="label">当前结果</div>
+          <div className="section-label">输出缓冲区 :: THE_BUFFER</div>
           <div className="result-card">
             <div
               className="img-container checkerboard-bg"
               onClick={() => imgUrl && setShowModal(true)}
             >
               {imgUrl ? (
-                <img src={imgUrl} alt="Result" title="点击放大" />
+                <img src={imgUrl} alt="采样结果" title="点击放大观察像素细节" />
               ) : (
-                <div className="placeholder">等待截图...</div>
+                <div className="placeholder-text">:: 等待采样脉冲指令...</div>
               )}
             </div>
             {imgUrl && (
               <div className="action-bar">
-                <Button size={ButtonSize.SM} onClick={copyToClipboard}>
-                  📋 复制
+                <Button size={ButtonSize.SM} onClick={copyToClipboard} variant={ButtonVariant.Ghost}>
+                  像素复制
                 </Button>
                 <Button
                   variant={ButtonVariant.Primary}
                   size={ButtonSize.SM}
                   onClick={downloadImage}
                 >
-                  📥 保存
+                  存入磁盘
                 </Button>
                 <Button
                   variant={ButtonVariant.Danger}
                   size={ButtonSize.SM}
                   onClick={() => setImgUrl(null)}
                 >
-                  🗑️ 移除
+                  清除缓存
                 </Button>
               </div>
             )}
@@ -189,7 +177,7 @@ export const Screenshot: React.FC = () => {
       </main>
 
       <footer className="history-footer">
-        <div className="label">历史记录</div>
+        <div className="section-label">捕获馈送序列 :: HISTORY_FEED</div>
         <div className="history-list">
           {history.map((url, i) => (
             <div
@@ -197,17 +185,20 @@ export const Screenshot: React.FC = () => {
               className="history-item checkerboard-bg"
               onClick={() => setImgUrl(url)}
             >
-              <img src={url} alt="History" />
+              <img src={url} alt={`历史快照 0x${i.toString(16)}`} />
               <button
                 className="del-btn"
                 onClick={(e) => removeFromHistory(i, e)}
+                title="移除此记录"
               >
                 ×
               </button>
             </div>
           ))}
           {history.length === 0 && (
-            <div className="history-empty">暂无历史快照</div>
+            <div className="history-empty" style={{ width: '100%', textAlign: 'center', opacity: 0.5, fontSize: '0.8rem' }}>
+              :: 当前序列为空 (NO_DATA)
+            </div>
           )}
         </div>
       </footer>
@@ -218,8 +209,7 @@ export const Screenshot: React.FC = () => {
             className="modal-content checkerboard-bg"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src={imgUrl} alt="Full size" />
-            <div className="modal-close">点击背景关闭</div>
+            <img src={imgUrl} alt="全尺寸快照" />
           </div>
         </div>
       )}
