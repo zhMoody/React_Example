@@ -27,3 +27,5 @@ dist-ssr
 .gemini/
 gha-creds-*.json
 GEMINI.md
+/impeccable-style-universal
+.gemini

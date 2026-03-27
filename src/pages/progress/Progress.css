@@ -103,19 +103,114 @@
 }
 
 .debug-info {
-  margin-top: 40px;
-  padding: 20px;
+  margin-top: 50px;
+  padding: 30px;
   background: var(--bg-card);
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
 }
 
-.debug-info li {
-  margin-top: 8px;
+.debug-info h4 {
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-align: center;
+  color: var(--primary-color);
+  font-size: 20px;
+}
+
+.principle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.principle-item h5 {
+  font-size: 16px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.xhr-text { color: #4facfe; }
+.fetch-text { color: #764ba2; }
+
+.principle-item ul {
+  padding-left: 20px;
+  margin: 0;
+}
+
+.principle-item li {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  font-size: 14px;
+  color: var(--text-subtle);
+}
+
+.principle-item strong {
+  color: var(--text-main);
 }
 
 @media (max-width: 800px) {
-  .main-layout {
+  .principle-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.comparison-table-wrapper {
+  margin-top: 40px;
+  overflow-x: auto;
+}
+
+.comparison-table-wrapper h5 {
+  text-align: center;
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: var(--text-main);
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.comparison-table th, 
+.comparison-table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-table th {
+  background: var(--bg-input);
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table .check {
+  color: #52c41a;
+  font-weight: 500;
+}
+
+.comparison-table .unsupported {
+  color: #ff4d4f;
+}
+
+.comparison-table .text-active {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+@media (max-width: 800px) {
+  .comparison-table {
+    font-size: 12px;
   }
 }

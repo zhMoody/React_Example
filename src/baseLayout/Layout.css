@@ -1,88 +1,231 @@
 /* Base Layout Container */
+:root {
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 80px;
+  --sidebar-transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .layout {
   display: flex;
   min-height: 100vh;
   width: 100%;
   background-color: var(--bg-layout);
-  transition: background-color var(--transition-speed);
+  transition: background-color var(--transition-main);
+  contain: layout;
 }
 
 /* Sidebar Menu Styling */
 .menu {
-  width: 260px;
+  width: var(--sidebar-width);
   background-color: var(--bg-sidebar);
   color: var(--text-on-dark);
   display: flex;
   flex-direction: column;
-  padding: 24px 16px;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+  padding: 20px 10px; /* 微调内边距 */
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.15);
   position: sticky;
   top: 0;
   height: 100vh;
-  transition: background-color var(--transition-speed);
+  transition: var(--sidebar-transition);
+  z-index: 100;
+  overflow: hidden;
+  border-right: 1px solid var(--border-color);
+  will-change: width;
+  contain: size layout style;
+  flex-shrink: 0;
+}
+
+.menu.collapsed {
+  width: var(--sidebar-collapsed-width);
 }
 
 .menu-header {
-  font-size: 1.25rem;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
   margin-bottom: 32px;
   padding: 0 12px;
-  color: var(--accent-color);
-  letter-spacing: 0.5px;
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: calc(var(--sidebar-width) - 20px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu.collapsed .menu-header {
+  min-width: 0;
+  justify-content: center;
+  padding: 0;
+}
+
+.logo-container {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu.collapsed .logo-container {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu-header .logo {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, var(--primary-color), #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.collapse-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-on-dark);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .menu-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px; /* 更紧凑的列表 */
+  flex: 1;
+  min-width: calc(var(--sidebar-width) - 20px);
 }
 
 .menu-item {
   text-decoration: none;
   color: var(--text-muted);
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  height: 42px; /* 更精致的高度 */
+  margin: 0 4px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  white-space: nowrap;
 }
 
 .menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
   color: var(--text-on-dark);
+  transform: translateX(2px);
 }
 
 .menu-item.active {
-  background-color: var(--accent-color);
-  color: #ffffff;
+  background-color: rgba(99, 102, 241, 0.15);
+  color: var(--primary-color);
+  border: 1px solid rgba(99, 102, 241, 0.1);
 }
 
-/* 主题切换按钮样式 */
-.theme-toggle-btn {
+.menu-item.active .menu-icon {
+  color: var(--primary-color);
+  opacity: 1;
+}
+
+.menu-icon {
+  min-width: 20px;
+  display: flex;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: inherit;
+  opacity: 0.7;
+}
+
+.menu-item:hover .menu-icon {
+  opacity: 1;
+}
+
+.menu-text {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+  flex: 1;
+}
+
+.line-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+}
+
+/* 键盘导航焦点样式优化 */
+.collapse-btn:focus-visible,
+.menu-item:focus-visible,
+.theme-toggle-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.menu.collapsed .menu-text {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Menu Footer */
+.menu-footer {
   margin-top: auto;
-  padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
-  color: var(--text-on-dark);
-  border-radius: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: calc(var(--sidebar-width) - 20px);
+}
+
+.theme-toggle-btn {
+  width: calc(100% - 8px);
+  margin: 0 4px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  border-radius: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s;
+  padding: 0 12px;
+  gap: 12px;
+  transition: all 0.2s ease;
+  overflow: hidden;
 }
 
 .theme-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-on-dark);
+}
+
+.menu.collapsed .theme-toggle-btn {
+  padding: 0 10px;
 }
 
 /* Content Area Styling */
 .content {
   flex: 1;
-  padding: 24px;
+  padding: 32px;
   overflow-y: auto;
+  height: 100vh;
+  background: var(--bg-layout);
+  contain: layout;
+}
+
+.content-inner {
+  max-width: 1200px;
+  margin: 0 auto;
 }
