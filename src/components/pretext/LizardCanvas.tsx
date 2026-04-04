@@ -15,9 +15,8 @@ const FS = `
   varying vec2 v;
   void main() {
     vec4 c = texture2D(t, v);
-    // WebGL 看到的“人物”必须比 Worker 看到的“障碍物”范围小，确保文字永远在可见边缘之外
-    float isGreen = step(0.48, c.g) * step(c.r * 1.1, c.g) * step(c.b * 1.1, c.g);
-    if (v.x < 0.01 || v.x > 0.99 || v.y < 0.01 || v.y > 0.99 || isGreen > 0.5) discard;
+    float isGreen = step(0.45, c.g) * step(c.r * 1.05, c.g) * step(c.b * 1.05, c.g);
+    if (isGreen > 0.5) discard;
     gl_FragColor = c;
   }
 `;
@@ -82,7 +81,7 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
         if (video.paused || video.ended) { rafId = requestAnimationFrame(render); return; }
         
-        const startTime = performance.now();
+        const t0 = performance.now();
         const dpr = window.devicePixelRatio || 1;
         const dw = containerRef.current!.clientWidth;
         const dh = containerRef.current!.clientHeight;
@@ -90,11 +89,15 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
         if (glCanvas.width !== dw * dpr) {
           glCanvas.width = dw * dpr; glCanvas.height = dh * dpr;
           glCanvas.style.width = `${dw}px`; glCanvas.style.height = `${dh}px`;
-          gl.viewport(0, 0, dw * dpr, dh * dpr);
         }
+
+        const vRatio = video.videoWidth / video.videoHeight || 1;
+        const rH = dh * 0.85, rW = rH * vRatio;
+        const rX = (dw - rW) / 2, rY = (dh - rH) / 2;
 
         if (video.readyState >= 2) {
           gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.viewport(rX * dpr, rY * dpr, rW * dpr, rH * dpr);
           gl.bindTexture(gl.TEXTURE_2D, tex);
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
           gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -108,10 +111,6 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
         }
 
         if (prepared && prepared.segments && currentProfile.length > 0) {
-          const vRatio = video.videoWidth / video.videoHeight || 1;
-          const rH = dh * 0.85, rW = rH * vRatio;
-          const rX = (dw - rW) / 2, rY = (dh - rH) / 2;
-
           let curY = 40;
           let cursor = { segmentIndex: 0, graphemeIndex: 0 };
           const padding = 40;
@@ -119,11 +118,8 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
           while (curY < dh - 40 && cursor.segmentIndex < prepared.segments.length) {
             const relY = (curY - rY) / rH;
-            
-            // --- 核心优化：深度垂直宽域扫描 ---
-            // 为了防止穿模，扫描范围覆盖整行文字高度，并向上下各延伸 15 像素
-            const startScanY = Math.floor(((curY - 15 - rY) / rH) * SH);
-            const endScanY = Math.ceil(((curY + lineHeight + 15 - rY) / rH) * SH);
+            const startScanY = Math.floor((relY - 0.01) * SH);
+            const endScanY = Math.ceil(((curY + lineHeight - rY) / rH + 0.01) * SH);
             
             let occupiedSpans: number[][] = [];
             for (let sy = startScanY; sy <= endScanY; sy++) {
@@ -144,11 +140,8 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
             let xX = padding;
             for (const span of merged) {
-              // --- 绝对映射坐标 (Normalized Map) ---
-              // 使用 100% 同步的数学比例进行换算，增加 25px 的固定避让带
-              const obsL = rX + (span[0] / SW) * rW - 25;
-              const obsR = rX + (span[1] / SW) * rW + 25;
-              
+              const obsL = rX + (span[0] / SW) * rW - 40; 
+              const obsR = rX + (span[1] / SW) * rW + 40;
               const availableW = obsL - xX;
               if (availableW > 35) {
                 const ln = layoutNextLine(prepared, cursor, availableW);
@@ -165,7 +158,8 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
           }
           onLinesUpdate(calculatedLines);
         }
-        onLayoutUpdate(performance.now() - startTime);
+        // 关键修复：使用正确的变量 t0 替换 startTime
+        onLayoutUpdate(performance.now() - t0);
         rafId = requestAnimationFrame(render);
       };
       setIsReady(true); render();
@@ -180,7 +174,7 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
       <video ref={videoRef} loop muted autoPlay playsInline crossOrigin="anonymous" style={{ display: 'none' }} />
       <canvas ref={glCanvasRef} style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }} />
       <canvas ref={syncCanvasRef} style={{ display: 'none' }} />
-      {!isReady && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontSize: '12px' }}>[ 校准精密排版坐标系... ]</div>}
+      {!isReady && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontSize: '12px' }}>[ 修正逻辑溢出异常... ]</div>}
     </div>
   );
 };
