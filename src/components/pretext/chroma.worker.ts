@@ -1,5 +1,5 @@
 /**
- * 亚像素级避障分析 Worker
+ * 亚像素避障分析 Worker
  */
 const ctx: Worker = self as any;
 
@@ -15,9 +15,11 @@ ctx.onmessage = (e: MessageEvent) => {
 
     for (let x = 0; x < SW; x++) {
       const i = rowOffset + x * 4;
-      const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
-      
-      // 极度灵敏判定：只要绿色不占绝对优势，就视为人物（障碍物）
+      const r = pixels[i],
+        g = pixels[i + 1],
+        b = pixels[i + 2];
+
+      // 只要绿色不占绝对优势，就视为人物（障碍物）
       const isGreen = g > 55 && g > r * 1.05 && g > b * 1.05;
       const isPerson = !isGreen;
 
