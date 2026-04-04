@@ -11,49 +11,54 @@ export const LizardHeader: React.FC<{ layoutTime: number, fps: number }> = ({ la
     zIndex: 10 
   }}>
     <div className="pretext-title">
-      <h1 style={{ color: 'var(--text-main)', margin: 0, fontSize: '18px', fontWeight: 'bold' }}>影像驱动动态排版</h1>
-      <p style={{ color: 'var(--text-subtle)', margin: 0, fontSize: '11px' }}>实时绿幕抠像 + Pretext 高性能布局引擎</p>
+      <h1 style={{ color: 'var(--text-main)', margin: 0, fontSize: '18px', fontWeight: 'bold' }}>视频驱动动态排版</h1>
+      <p style={{ color: 'var(--text-subtle)', margin: 0, fontSize: '11px' }}>Retina 级别高清渲染 + Pretext 多槽位避障系统</p>
     </div>
     <div className="pretext-stats" style={{ display: 'flex', gap: '30px' }}>
       <div style={{ textAlign: 'right' }}>
         <span style={{ color: 'var(--primary-color)', display: 'block', fontWeight: 'bold', fontFamily: 'monospace', fontSize: '16px' }}>{layoutTime.toFixed(2)}ms</span>
-        <span style={{ color: 'var(--text-muted)', fontSize: '9px', textTransform: 'uppercase' }}>排版耗时</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: '9px' }}>排版开销</span>
       </div>
       <div style={{ textAlign: 'right' }}>
         <span style={{ color: fps > 50 ? '#10b981' : '#f59e0b', display: 'block', fontWeight: 'bold', fontFamily: 'monospace', fontSize: '16px' }}>{fps}</span>
-        <span style={{ color: 'var(--text-muted)', fontSize: '9px', textTransform: 'uppercase' }}>实时帧率</span>
+        <span style={{ color: 'var(--text-muted)', fontSize: '9px' }}>实时帧率</span>
       </div>
     </div>
   </div>
 );
 
 export const LizardControls: React.FC<{
-  fontSize: number; setFontSize: (v: number) => void;
-  lineHeight: number; setLineHeight: (v: number) => void;
+  videoUrl: string;
   onVideoUpload: (file: File) => void;
-}> = ({ fontSize, setFontSize, lineHeight, setLineHeight, onVideoUpload }) => (
+}> = ({ videoUrl, onVideoUpload }) => (
   <div className="pretext-controls" style={{ 
     position: 'absolute', 
     bottom: '25px', 
     left: '25px', 
     background: 'var(--bg-card)', 
-    padding: '20px', 
+    padding: '12px', 
     borderRadius: '12px', 
     border: '1px solid var(--border-color)', 
     zIndex: 100, 
-    boxShadow: '0 8px 32px rgba(0,0,0,0.3)', 
-    width: '240px',
-    backdropFilter: 'blur(8px)'
+    boxShadow: '0 8px 32px rgba(0,0,0,0.4)', 
+    width: '200px',
+    backdropFilter: 'blur(12px)'
   }}>
-    <div style={{ marginBottom: '18px' }}>
-      <label style={{ color: 'var(--text-subtle)', display: 'block', fontSize: '11px', marginBottom: '8px', fontWeight: '500' }}>文字大小: {fontSize}px</label>
-      <input type="range" min="10" max="22" value={fontSize} onChange={e => setFontSize(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--primary-color)' }} />
+    {/* 视频预览窗口 */}
+    <div style={{ 
+      width: '100%', 
+      aspectRatio: '16/9', 
+      background: '#000', 
+      borderRadius: '6px', 
+      overflow: 'hidden', 
+      marginBottom: '12px',
+      border: '1px solid #333'
+    }}>
+      <video src={videoUrl} muted autoPlay loop style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
     </div>
-    <div style={{ marginBottom: '22px' }}>
-      <label style={{ color: 'var(--text-subtle)', display: 'block', fontSize: '11px', marginBottom: '8px', fontWeight: '500' }}>行间距: {lineHeight}px</label>
-      <input type="range" min="14" max="32" value={lineHeight} onChange={e => setLineHeight(Number(e.target.value))} style={{ width: '100%', accentColor: 'var(--primary-color)' }} />
-    </div>
-    <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '15px' }}>
+
+    <div style={{ textAlign: 'center' }}>
+      <label style={{ color: 'var(--text-muted)', display: 'block', fontSize: '10px', marginBottom: '8px', letterSpacing: '1px' }}>参数已固定: 22px / 32px</label>
       <label htmlFor="video-upload" style={{ 
         display: 'block', 
         background: 'var(--primary-color)', 
@@ -64,7 +69,7 @@ export const LizardControls: React.FC<{
         fontSize: '12px', 
         cursor: 'pointer', 
         fontWeight: 'bold',
-        transition: 'opacity 0.2s'
+        transition: 'filter 0.2s'
       }}>
         更换绿幕视频
       </label>

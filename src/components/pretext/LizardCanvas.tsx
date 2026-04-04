@@ -3,11 +3,11 @@ import { layoutNextLine } from '@chenglou/pretext';
 
 interface VideoTextEngineProps {
   prepared: any; fontSize: number; lineHeight: number; videoUrl: string;
-  onLayoutUpdate: (time: number) => void;
+  onLinesUpdate: (lines: any[]) => void;
   onFpsUpdate: (fps: number) => void;
+  onLayoutUpdate: (time: number) => void;
 }
 
-// WebGL 着色器代码：极致性能的绿色过滤逻辑
 const VS = `attribute vec2 p; varying vec2 v; void main() { v = p * 0.5 + 0.5; v.y = 1.0 - v.y; gl_Position = vec4(p, 0, 1); }`;
 const FS = `
   precision mediump float;
@@ -15,41 +15,43 @@ const FS = `
   varying vec2 v;
   void main() {
     vec4 c = texture2D(t, v);
-    // 算法：检测绿色通道的主导地位
-    float isGreen = step(0.5, c.g) * step(c.r * 1.1, c.g) * step(c.b * 1.1, c.g);
-    // 物理裁剪边缘 2% 的像素，彻底解决绿线问题
-    if (v.x < 0.02 || v.x > 0.98 || v.y < 0.02 || v.y > 0.98 || isGreen > 0.5) discard;
+    // WebGL 看到的“人物”必须比 Worker 看到的“障碍物”范围小，确保文字永远在可见边缘之外
+    float isGreen = step(0.48, c.g) * step(c.r * 1.1, c.g) * step(c.b * 1.1, c.g);
+    if (v.x < 0.01 || v.x > 0.99 || v.y < 0.01 || v.y > 0.99 || isGreen > 0.5) discard;
     gl_FragColor = c;
   }
 `;
 
-export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSize, lineHeight, videoUrl, onLayoutUpdate, onFpsUpdate }) => {
+export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSize, lineHeight, videoUrl, onLinesUpdate, onFpsUpdate, onLayoutUpdate }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const glCanvasRef = useRef<HTMLCanvasElement>(null); // WebGL 层 (GPU)
-  const textCanvasRef = useRef<HTMLCanvasElement>(null); // 文字层 (Retina)
-  const syncCanvasRef = useRef<HTMLCanvasElement>(null); // 低频采样层
-  
+  const glCanvasRef = useRef<HTMLCanvasElement>(null);
+  const syncCanvasRef = useRef<HTMLCanvasElement>(null);
+  const workerRef = useRef<Worker | null>(null);
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    workerRef.current = new Worker(new URL('./chroma.worker.ts', import.meta.url), { type: 'module' });
     const video = videoRef.current;
     if (!video || !videoUrl) return;
 
     let rafId: number;
     let frames = 0;
     let lastFpsTime = performance.now();
-    let profile: any[] = [];
+    let currentProfile: any[] = [];
+    let isWorkerBusy = false;
+
+    workerRef.current.onmessage = (e) => {
+      currentProfile = e.data.profile;
+      isWorkerBusy = false;
+    };
 
     const startEngine = () => {
       const glCanvas = glCanvasRef.current!;
-      const textCanvas = textCanvasRef.current!;
       const syncCanvas = syncCanvasRef.current!;
       const gl = glCanvas.getContext('webgl', { alpha: true, antialias: true })!;
-      const tctx = textCanvas.getContext('2d')!;
       const sctx = syncCanvas.getContext('2d', { willReadFrequently: true })!;
 
-      // 1. 初始化 WebGL 高清着色器程序
       const createShader = (t: number, s: string) => {
         const sh = gl.createShader(t)!; gl.shaderSource(sh, s); gl.compileShader(sh); return sh;
       };
@@ -61,9 +63,8 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
       const buf = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-      const pLoc = gl.getAttribLocation(prog, 'p');
-      gl.enableVertexAttribArray(pLoc);
-      gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(gl.getAttribLocation(prog, 'p'));
+      gl.vertexAttribPointer(gl.getAttribLocation(prog, 'p'), 2, gl.FLOAT, false, 0, 0);
 
       const tex = gl.createTexture();
       gl.bindTexture(gl.TEXTURE_2D, tex);
@@ -71,8 +72,8 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
-      // 采样分辨率 (越低避障越丝滑)
-      const SW = 80, SH = 60; syncCanvas.width = SW; syncCanvas.height = SH;
+      const SW = 320, SH = 240; 
+      syncCanvas.width = SW; syncCanvas.height = SH;
 
       const render = () => {
         const now = performance.now();
@@ -81,89 +82,105 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
         if (video.paused || video.ended) { rafId = requestAnimationFrame(render); return; }
         
-        const t0 = performance.now();
+        const startTime = performance.now();
         const dpr = window.devicePixelRatio || 1;
         const dw = containerRef.current!.clientWidth;
         const dh = containerRef.current!.clientHeight;
 
-        // Retina 级别物理分辨率对齐
-        if (textCanvas.width !== dw * dpr) {
-          [glCanvas, textCanvas].forEach(c => {
-            c.width = dw * dpr; c.height = dh * dpr;
-            c.style.width = `${dw}px`; c.style.height = `${dh}px`;
-          });
+        if (glCanvas.width !== dw * dpr) {
+          glCanvas.width = dw * dpr; glCanvas.height = dh * dpr;
+          glCanvas.style.width = `${dw}px`; glCanvas.style.height = `${dh}px`;
           gl.viewport(0, 0, dw * dpr, dh * dpr);
-          tctx.scale(dpr, dpr);
         }
 
-        // --- STEP 1: GPU 实时高清抠像渲染 ---
-        gl.clearColor(0, 0, 0, 0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        if (video.readyState >= 2) {
+          gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.bindTexture(gl.TEXTURE_2D, tex);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
+          gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        }
 
-        // --- STEP 2: 低频 CPU 采样 (仅用于 Pretext 避障) ---
-        if (frames % 2 === 0) { // 每两帧采样一次障碍物，极致省电
+        if (!isWorkerBusy && video.readyState >= 2) {
           sctx.drawImage(video, 0, 0, SW, SH);
-          const pixels = sctx.getImageData(0, 0, SW, SH).data;
-          profile = new Array(SH).fill(null).map(() => ({ min: SW, max: 0 }));
-          for (let i = 0; i < pixels.length; i += 4) {
-            if (!(pixels[i+1] > 70 && pixels[i+1] > pixels[i] * 1.1)) {
-              const x = (i/4)%SW, y = Math.floor((i/4)/SW);
-              if (x < profile[y].min) profile[y].min = x; if (x > profile[y].max) profile[y].max = x;
-            }
-          }
+          const imageData = sctx.getImageData(0, 0, SW, SH);
+          isWorkerBusy = true;
+          workerRef.current?.postMessage({ imageData, SW, SH }, [imageData.data.buffer]);
         }
 
-        // --- STEP 3: 高清 Pretext 排版 ---
-        tctx.clearRect(0, 0, dw, dh);
-        if (prepared && prepared.segments) {
-          tctx.fillStyle = '#fff'; tctx.font = `bold ${fontSize}px "Inter", sans-serif`;
-          tctx.textBaseline = 'top'; tctx.shadowColor = 'rgba(0,0,0,0.9)'; tctx.shadowBlur = 10;
+        if (prepared && prepared.segments && currentProfile.length > 0) {
+          const vRatio = video.videoWidth / video.videoHeight || 1;
+          const rH = dh * 0.85, rW = rH * vRatio;
+          const rX = (dw - rW) / 2, rY = (dh - rH) / 2;
 
           let curY = 40;
           let cursor = { segmentIndex: 0, graphemeIndex: 0 };
           const padding = 40;
+          const calculatedLines: any[] = [];
 
           while (curY < dh - 40 && cursor.segmentIndex < prepared.segments.length) {
-            const ay = Math.floor((curY / dh) * SH);
-            const row = profile[Math.min(Math.max(0, ay), SH - 1)];
+            const relY = (curY - rY) / rH;
             
-            if (row && row.min < row.max) {
-              const obsL = (row.min / SW) * dw - 30;
-              const obsR = (row.max / SW) * dw + 30;
-              const leftW = obsL - padding;
-              if (leftW > 40) { const lnL = layoutNextLine(prepared, cursor, leftW); if (lnL) { tctx.fillText(lnL.text, padding, curY); cursor = lnL.end; } }
-              const rightW = (dw - padding) - obsR;
-              if (rightW > 40) { const lnR = layoutNextLine(prepared, cursor, rightW); if (lnR) { tctx.fillText(lnR.text, obsR, curY); cursor = lnR.end; } }
-            } else {
-              const ln = layoutNextLine(prepared, cursor, dw - padding * 2);
-              if (ln) { tctx.fillText(ln.text, padding, curY); cursor = ln.end; }
+            // --- 核心优化：深度垂直宽域扫描 ---
+            // 为了防止穿模，扫描范围覆盖整行文字高度，并向上下各延伸 15 像素
+            const startScanY = Math.floor(((curY - 15 - rY) / rH) * SH);
+            const endScanY = Math.ceil(((curY + lineHeight + 15 - rY) / rH) * SH);
+            
+            let occupiedSpans: number[][] = [];
+            for (let sy = startScanY; sy <= endScanY; sy++) {
+              const row = currentProfile[Math.min(Math.max(0, sy), SH - 1)];
+              if (row) occupiedSpans.push(...row);
+            }
+
+            occupiedSpans.sort((a, b) => a[0] - b[0]);
+            const merged: number[][] = [];
+            if (occupiedSpans.length > 0) {
+              let current = [occupiedSpans[0][0], occupiedSpans[0][1]];
+              for (let i = 1; i < occupiedSpans.length; i++) {
+                if (occupiedSpans[i][0] <= current[1] + 10) current[1] = Math.max(current[1], occupiedSpans[i][1]);
+                else { merged.push([current[0], current[1]]); current = [occupiedSpans[i][0], occupiedSpans[i][1]]; }
+              }
+              merged.push(current);
+            }
+
+            let xX = padding;
+            for (const span of merged) {
+              // --- 绝对映射坐标 (Normalized Map) ---
+              // 使用 100% 同步的数学比例进行换算，增加 25px 的固定避让带
+              const obsL = rX + (span[0] / SW) * rW - 25;
+              const obsR = rX + (span[1] / SW) * rW + 25;
+              
+              const availableW = obsL - xX;
+              if (availableW > 35) {
+                const ln = layoutNextLine(prepared, cursor, availableW);
+                if (ln) { calculatedLines.push({ text: ln.text, x: xX, y: curY, w: ln.width }); cursor = ln.end; }
+              }
+              xX = Math.max(xX, obsR);
+            }
+            const lastW = (dw - padding) - xX;
+            if (lastW > 35) {
+              const ln = layoutNextLine(prepared, cursor, lastW);
+              if (ln) { calculatedLines.push({ text: ln.text, x: xX, y: curY, w: ln.width }); cursor = ln.end; }
             }
             curY += lineHeight;
           }
+          onLinesUpdate(calculatedLines);
         }
-
-        onLayoutUpdate(performance.now() - t0);
+        onLayoutUpdate(performance.now() - startTime);
         rafId = requestAnimationFrame(render);
       };
       setIsReady(true); render();
     };
 
     video.src = videoUrl; video.addEventListener('playing', startEngine); video.play().catch(() => {});
-    return () => cancelAnimationFrame(rafId);
+    return () => { workerRef.current?.terminate(); cancelAnimationFrame(rafId); };
   }, [prepared, fontSize, lineHeight, videoUrl]);
 
   return (
     <div ref={containerRef} onClick={() => videoRef.current?.play()} style={{ width: '100%', height: '100%', background: '#000', position: 'relative', overflow: 'hidden' }}>
       <video ref={videoRef} loop muted autoPlay playsInline crossOrigin="anonymous" style={{ display: 'none' }} />
-      {/* GPU 渲染层 */}
       <canvas ref={glCanvasRef} style={{ position: 'absolute', top: 0, left: 0, zIndex: 1 }} />
-      {/* 高清文字层 */}
-      <canvas ref={textCanvasRef} style={{ position: 'absolute', top: 0, left: 0, zIndex: 2 }} />
       <canvas ref={syncCanvasRef} style={{ display: 'none' }} />
-      {!isReady && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontSize: '12px' }}>[ 分配 WebGL 着色核心... ]</div>}
+      {!isReady && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontSize: '12px' }}>[ 校准精密排版坐标系... ]</div>}
     </div>
   );
 };

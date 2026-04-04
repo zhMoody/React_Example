@@ -1,33 +1,38 @@
 /**
- * 避障分析 + 掩码生成 Worker
+ * 亚像素级避障分析 Worker
  */
-self.onmessage = (e: MessageEvent) => {
-  const { imageData, AW, AH } = e.data;
+const ctx: Worker = self as any;
+
+ctx.onmessage = (e: MessageEvent) => {
+  const { imageData, SW, SH } = e.data;
   const pixels = imageData.data;
-  const profile = new Array(AH).fill(null).map(() => ({ min: AW, max: 0 }));
+  const profile = new Array(SH);
 
-  // 在 Worker 中处理低分辨率抠像，生成黑白掩码
-  for (let i = 0; i < pixels.length; i += 4) {
-    const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
-    const isGreen = g > 65 && g > r * 1.1 && g > b * 1.1;
+  for (let y = 0; y < SH; y++) {
+    const rowSpans: number[][] = [];
+    let start = -1;
+    const rowOffset = y * SW * 4;
 
-    if (isGreen) {
-      // 绿色背景设为完全透明黑色
-      pixels[i] = pixels[i+1] = pixels[i+2] = 0;
-      pixels[i + 3] = 0;
-    } else {
-      // 人物区域设为不透明白色 (用于遮罩)
-      pixels[i] = pixels[i+1] = pixels[i+2] = 255;
-      pixels[i + 3] = 255;
+    for (let x = 0; x < SW; x++) {
+      const i = rowOffset + x * 4;
+      const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
+      
+      // 极度灵敏判定：只要绿色不占绝对优势，就视为人物（障碍物）
+      const isGreen = g > 55 && g > r * 1.05 && g > b * 1.05;
+      const isPerson = !isGreen;
 
-      const idx = i / 4;
-      const x = idx % AW, y = Math.floor(idx / AW);
-      // 避障逻辑排除边缘
-      if (x > 5 && x < AW - 5 && y > 5 && y < AH - 5) {
-        if (x < profile[y].min) profile[y].min = x;
-        if (x > profile[y].max) profile[y].max = x;
+      if (isPerson && start === -1) {
+        // 向左膨胀 8 像素，预留安全区
+        start = Math.max(0, x - 8);
+      } else if (!isGreen === false && start !== -1) {
+        // 向右膨胀 8 像素
+        rowSpans.push([start, Math.min(SW - 1, x + 8)]);
+        start = -1;
       }
     }
+    if (start !== -1) rowSpans.push([start, SW - 1]);
+    profile[y] = rowSpans;
   }
-  self.postMessage({ imageData, profile }, [imageData.data.buffer]);
+
+  ctx.postMessage({ profile });
 };
