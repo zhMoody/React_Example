@@ -101,7 +101,7 @@ export const Virtual = () => {
             <VirtualList
               listData={sharedListData}
               itemHeight={80}
-              containerHight={450}
+              containerHight={500}
               bufferCount={10}
             />
           </div>
@@ -137,7 +137,7 @@ export const Virtual = () => {
             <DynamicVirtualList
               listData={sharedListData}
               estimatedItemHeight={80}
-              containerHeight={450}
+              containerHeight={500}
               bufferCount={10}
             />
           </div>
@@ -169,7 +169,7 @@ export const Virtual = () => {
             <SegmentedVirtualList
               listData={sharedListData}
               estimatedItemHeight={80}
-              containerHeight={450}
+              containerHeight={500}
               bufferCount={10}
               segmentSize={1000}
             />
@@ -259,7 +259,7 @@ export const Virtual = () => {
               </p>
             </div>
           </div>
-          <div className="module-viewport" style={{ height: "450px" }}>
+          <div className="module-viewport">
             <EditableVirtualList
               ref={editableRef}
               initialData={sharedListData}

@@ -65,6 +65,7 @@
   border-radius: 12px;
   display: flex;
   flex-direction: column;
+  height: 750px; /* 统一高度 */
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -152,7 +153,6 @@
   background: #0a0a0a; /* 更深邃的黑 */
   position: relative;
   overflow: hidden;
-  min-height: 400px;
 }
 
 /* 核心修复：滚动隔离 */

@@ -9,6 +9,7 @@ import { WaterMark } from "../pages/water_mark/WaterMark";
 import { User } from "../pages/user/user";
 import { CanvasMonitor } from "../pages/Canvas/CanvasMonitor";
 import { Progress } from "../pages/progress/Progress";
+import PretextDemo from "../pages/pretext/pretext";
 
 /**
  * 扩展官方 RouteObject 类型，增加自定义的属性
@@ -29,6 +30,12 @@ const route: AppRouteObject[] = [
         element: <Virtual />,
         id: "虚拟列表",
         icon: "🏠",
+      },
+      {
+        path: "/pretext",
+        element: <PretextDemo />,
+        id: "Pretext 文本引擎",
+        icon: "🖋️",
       },
       {
         path: "/canvas",
