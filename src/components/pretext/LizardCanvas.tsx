@@ -7,9 +7,10 @@ interface VideoTextEngineProps {
   lineHeight: number;
   videoUrl: string;
   onLayoutUpdate: (time: number) => void;
+  onFpsUpdate: (fps: number) => void;
 }
 
-export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSize, lineHeight, videoUrl, onLayoutUpdate }) => {
+export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSize, lineHeight, videoUrl, onLayoutUpdate, onFpsUpdate }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const displayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -22,6 +23,10 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
     let rafId: number;
     let engineStarted = false;
+    let lastTime = performance.now();
+    let frames = 0;
+    let fpsInterval = 500; // 每 500ms 更新一次 FPS
+    let lastFpsUpdate = lastTime;
 
     const startEngine = () => {
       const displayCanvas = displayCanvasRef.current;
@@ -36,8 +41,19 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
       bufferCanvas.width = AW; bufferCanvas.height = AH;
 
       const render = () => {
+        const now = performance.now();
+        frames++;
+
+        // 真实 FPS 计算逻辑
+        if (now - lastFpsUpdate >= fpsInterval) {
+          const actualFps = Math.round((frames * 1000) / (now - lastFpsUpdate));
+          onFpsUpdate(actualFps);
+          frames = 0;
+          lastFpsUpdate = now;
+        }
+
         if (video.paused || video.ended) {
-          if (video.paused && isReady) video.play().catch(() => {}); // 自动唤醒
+          if (video.paused && isReady) video.play().catch(() => {});
           rafId = requestAnimationFrame(render);
           return;
         }
@@ -57,8 +73,6 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
           const r = pixels[i], g = pixels[i+1], b = pixels[i+2];
           const isGreen = g > 60 && g > r * 1.1 && g > b * 1.1;
           const idx = i / 4, y = Math.floor(idx / AW), x = idx % AW;
-          
-          // 避障逻辑也忽略最边缘 4 像素
           if (!isGreen && x > 4 && x < AW - 4 && y > 4 && y < AH - 4) {
             if (x < profile[y].min) profile[y].min = x;
             if (x > profile[y].max) profile[y].max = x;
@@ -72,14 +86,9 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
         const renderX = (dw - renderW) / 2, renderY = (dh - renderH) / 2;
 
         dctx.save();
-        // --- 核心修复：物理裁剪掉视频边缘 8px，彻底干掉绿线 ---
-        dctx.beginPath();
-        dctx.rect(renderX + 8, renderY + 8, renderW - 16, renderH - 16);
-        dctx.clip();
-        
+        dctx.beginPath(); dctx.rect(renderX + 8, renderY + 8, renderW - 16, renderH - 16); dctx.clip();
         dctx.drawImage(video, renderX, renderY, renderW, renderH);
         
-        // 渲染层抠像
         const frameData = dctx.getImageData(renderX, renderY, renderW, renderH);
         const d = frameData.data;
         for (let i = 0; i < d.length; i += 4) {
@@ -90,8 +99,10 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
         // 3. Pretext 排版
         if (prepared && prepared.segments) {
-          dctx.fillStyle = '#fff'; dctx.font = `${fontSize}px "Inter", sans-serif`;
-          dctx.textBaseline = 'top'; dctx.shadowColor = 'rgba(0,0,0,0.9)'; dctx.shadowBlur = 8;
+          dctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          dctx.font = `${fontSize}px "Inter", sans-serif`;
+          dctx.textBaseline = 'top';
+          dctx.shadowColor = 'rgba(0,0,0,0.8)'; dctx.shadowBlur = 8;
 
           let curY = 40;
           let cursor = { segmentIndex: 0, graphemeIndex: 0 };
@@ -123,6 +134,7 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
             }
             curY += lineHeight;
           }
+          dctx.shadowBlur = 0;
         }
 
         onLayoutUpdate(performance.now() - startTime);
@@ -133,13 +145,7 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
 
     video.src = videoUrl;
     video.load();
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        console.log("Waiting for user interaction to play video...");
-      });
-    }
-
+    video.play().catch(() => {});
     video.addEventListener('playing', startEngine);
     return () => {
       video.removeEventListener('playing', startEngine);
@@ -152,7 +158,7 @@ export const LizardCanvas: React.FC<VideoTextEngineProps> = ({ prepared, fontSiz
       <video ref={videoRef} loop muted autoPlay playsInline crossOrigin="anonymous" style={{ display: 'none' }} />
       <canvas ref={displayCanvasRef} style={{ width: '100%', height: '100%' }} />
       <canvas ref={bufferCanvasRef} style={{ display: 'none' }} />
-      {!isReady && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontSize: '12px', fontFamily: 'monospace' }}>[ SYSTEM_BOOT_SEQUENCE_INITIALIZED ]</div>}
+      {!isReady && <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: '#0f0', fontSize: '12px', fontFamily: 'monospace' }}>[ 系统正在初始化高清渲染集群... ]</div>}
     </div>
   );
 };

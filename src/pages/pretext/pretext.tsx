@@ -7,11 +7,10 @@ import {
 } from "../../components/pretext/LizardUI";
 import "./PretextDemo.css";
 
-// 默认视频路径（assets）
 import defaultVideo from "../../assets/steve.mp4";
 
 const TEXT_CONTENT =
-  `CHROMA_KEY_LAYOUT_SYSTEM // v11.0_STABLE. This engine extracts character silhouettes from video streams in real-time. By analyzing pixel data through a low-latency chroma buffer, we identify the non-green boundaries of the subject. These coordinates are then mapped to the Pretext layout grid, allowing text to part organically around moving actors. The result is a seamless fusion of video motion and typographic structure. Dynamic wrapping. Precision profiling. Editorial motion design. `.repeat(
+  `CHROMA_KEY_LAYOUT_SYSTEM // v11.0_STABLE. 实时绿幕抠像技术。文字流会自动避开画面中的非绿色区域。通过 Pretext 高性能迭代器，我们实现了每秒 60 帧的实时重排。这种效果常用于电影开场动画或高级数字画报。文字不再是死板的背景，而是具有物理实体的流体。您可以尝试调整字号和行高，观察排版如何适应人物轮廓的变化。 `.repeat(
     20,
   );
 
@@ -19,6 +18,7 @@ const PretextDemo: React.FC = () => {
   const [fontSize, setFontSize] = useState(13);
   const [lineHeight, setLineHeight] = useState(18);
   const [layoutTime, setLayoutTime] = useState(0);
+  const [fps, setFps] = useState(60);
   const [videoUrl, setVideoUrl] = useState(defaultVideo);
 
   const prepared = useMemo(
@@ -28,8 +28,7 @@ const PretextDemo: React.FC = () => {
   );
 
   const handleVideoUpload = (file: File) => {
-    const url = URL.createObjectURL(file);
-    setVideoUrl(url);
+    setVideoUrl(URL.createObjectURL(file));
   };
 
   return (
@@ -39,10 +38,10 @@ const PretextDemo: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        background: "#1c1c1c",
+        background: "var(--bg-layout)",
       }}
     >
-      <LizardHeader layoutTime={layoutTime} />
+      <LizardHeader layoutTime={layoutTime} fps={fps} />
 
       <div
         style={{
@@ -58,6 +57,7 @@ const PretextDemo: React.FC = () => {
           lineHeight={lineHeight}
           videoUrl={videoUrl}
           onLayoutUpdate={setLayoutTime}
+          onFpsUpdate={setFps}
         />
 
         <LizardControls
